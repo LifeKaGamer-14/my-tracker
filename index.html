@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Planner: Habits & Studies</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap');
+  
+  :root {
+    --bg: #f8f7f4; --surface: #fff; --border: #e2e0d9; --accent: #3d6b4f;
+    --accent2: #c97d3e; --text: #1a1a18; --muted: #7a7870; --cell: 28px;
+    --chart-grid: rgba(0,0,0,0.05);
+  }
+
+  [data-theme="dark"] {
+    --bg: #121212; --surface: #1e1e1e; --border: #333; --accent: #82b394;
+    --accent2: #e09d62; --text: #e0e0e0; --muted: #a0a0a0;
+    --chart-grid: rgba(255,255,255,0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.2s, color 0.2s; }
+  body { background: var(--bg); font-family: 'Syne', sans-serif; color: var(--text); padding: 1.5rem; }
+  h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px;}
+  .creator-tag { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--accent); font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;}
+  .sub { font-size: 13px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  
+  .header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
+  .controls { display: flex; gap: 8px; align-items: center; }
+  
+  .btn { border: 0.5px solid var(--border); border-radius: 6px; padding: 8px 14px; font-size: 13px; background: var(--surface); color: var(--text); cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 500; }
+  .btn:hover { background: var(--bg); }
+  .btn-accent { border: none; background: var(--accent); color: white; }
+  .btn-accent:hover { background: var(--accent); opacity: 0.9; }
+
+  /* Main Tabs */
+  .main-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
+  .main-tab { background: none; border: none; font-family: 'Syne'; font-size: 16px; font-weight: 600; color: var(--muted); cursor: pointer; padding: 5px 10px; white-space: nowrap; }
+  .main-tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); margin-bottom: -12px; }
+
+  .view-section { display: none; animation: fadeIn 0.3s; }
+  .view-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Habit Tracker Styles */
+  .tracker-wrap { overflow-x: auto; margin-bottom: 1.5rem; border-radius: 8px; border: 0.5px solid var(--border); }
+  table.grid { border-collapse: collapse; min-width: 100%; background: var(--surface); }
+  table.grid th, table.grid td { border: 0.5px solid var(--border); font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text); }
+  table.grid thead th { background: var(--surface); color: var(--muted); padding: 8px 2px; }
+  table.grid thead th.habit-col { text-align: left; padding: 10px; min-width: 180px; font-family: 'Syne', sans-serif; font-size: 12px; }
+  
+  .habit-name input { border: none; outline: none; background: transparent; font-size: 13px; font-family: 'Syne', sans-serif; color: var(--text); width: 100%; }
+  .day-cell { text-align: center; cursor: pointer; height: var(--cell); min-width: var(--cell); }
+  .day-cell.done { background: var(--accent); opacity: 0.3; position: relative; }
+  .day-cell.done::after { content: '✓'; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: var(--text); font-weight: 700; opacity: 1; }
+  
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .stat { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 16px; }
+  .stat .s-val { font-size: 24px; font-weight: 700; color: var(--accent); }
+  .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+  .chart-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem; }
+
+  /* Study Tracker Styles */
+  .sub-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .sub-tab { padding: 6px 14px; border-radius: 20px; background: var(--surface); border: 1px solid var(--border); cursor: pointer; font-size: 13px; font-weight: 500; }
+  .sub-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+  
+  .study-dashboard { display: grid; grid-template-columns: 250px 1fr; gap: 20px; }
+  @media(max-width: 768px) { .study-dashboard { grid-template-columns: 1fr; } }
+  
+  .study-chart-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .pie-container { height: 180px; width: 100%; position: relative; display: flex; justify-content: center; margin-top: 15px; }
+  
+  .study-table-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .study-table { width: 100%; border-collapse: collapse; }
+  .study-table th, .study-table td { border-bottom: 0.5px solid var(--border); border-right: 0.5px solid var(--border); padding: 12px; font-size: 13px; text-align: left; }
+  .study-table th { background: #fafafa; font-family: 'DM Mono'; font-size: 11px; color: var(--muted); text-transform: uppercase; }
+  [data-theme="dark"] .study-table th { background: #252525; }
+  .study-table td:last-child, .study-table th:last-child { border-right: none; }
+  .study-table tr:last-child td { border-bottom: none; }
+  
+  .chapter-input { border: none; background: transparent; font-family: inherit; font-size: 13px; color: var(--text); width: 100%; outline: none; padding: 4px; margin: -4px; border-radius: 4px; transition: 0.2s ease; }
+  .chapter-input:hover, .chapter-input:focus { background: var(--bg); }
+  .chapter-input:focus { color: var(--accent); border-bottom: 1px dashed var(--accent); border-radius: 4px 4px 0 0; }
+  
+  .study-check { text-align: center; cursor: pointer; width: 70px; font-weight: bold; }
+  .study-check.done { background: rgba(61, 107, 79, 0.15); color: var(--accent); }
+  .study-check.done::after { content: '✓'; }
+  .empty-state { padding: 40px; text-align: center; color: var(--muted); font-size: 14px; font-style: italic; }
+  .toolbar { padding: 15px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: flex-end; }
+</style>
+</head>
+<body>
+
+<div class="header-row">
+  <div>
+    <h1>Console & Campus</h1>
+    <div class="creator-tag">Created by FARHAN HAIDER KHAN / LIFEKAGAMER</div>
+    <p class="sub"> Dashboard: Habits, Boards & JEE.</p>
+  </div>
+  <div class="controls">
+    <button class="btn" id="themeToggle">🌓 Toggle Theme</button>
+  </div>
+</div>
+
+<div class="main-tabs">
+  <button class="main-tab active" onclick="setMainTab('Habits')">Habit Tracker</button>
+  <button class="main-tab" onclick="setMainTab('ISC Class 11')">ISC Class 11</button>
+  <button class="main-tab" onclick="setMainTab('ISC Class 12')">ISC Class 12</button>
+  <button class="main-tab" onclick="setMainTab('Mains')">JEE Mains</button>
+  <button class="main-tab" onclick="setMainTab('Advanced')">JEE Advanced</button>
+</div>
+
+<div id="view-Habits" class="view-section active">
+  <div class="header-row" style="margin-bottom: 10px;">
+    <h2 style="font-size:18px;">Monthly Habits</h2>
+    <div class="controls">
+      <button class="btn" id="prevM">←</button>
+      <span id="monthLabel" style="font-family:'DM Mono'; font-size:14px; width:120px; text-align:center;"></span>
+      <button class="btn" id="nextM">→</button>
+      <button class="btn btn-accent" id="addHabit">+ New Habit</button>
+    </div>
+  </div>
+  
+  <div class="stat-row" id="statsRow">
+    <div class="stat"><div class="sub">Total Checks</div><div class="s-val" id="stTotalChecks">0</div></div>
+    <div class="stat"><div class="sub">Active Habits</div><div class="s-val" id="stBestStreak">0</div></div>
+    <div class="stat"><div class="sub">Avg Completion</div><div class="s-val" id="stAvgComp" style="color:var(--accent2)">0%</div></div>
+  </div>
+
+  <div class="tracker-wrap">
+    <table class="grid" id="habitGrid">
+      <thead><tr id="gridHead"></tr></thead>
+      <tbody id="gridBody"></tbody>
+    </table>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card"><canvas id="lineChart"></canvas></div>
+    <div class="chart-card"><canvas id="barChart" style="display:none;"></canvas></div> </div>
+</div>
+
+<div id="view-Study" class="view-section">
+  <div class="sub-tabs" id="subTabsContainer"></div>
+  
+  <div class="study-dashboard">
+    <div class="study-chart-card">
+      <h3 style="font-size:16px;" id="chartTitle">Subject Progress</h3>
+      <div class="sub">Theory, Ex, PYQ, Rev</div>
+      <div class="pie-container"><canvas id="studyPieChart"></canvas></div>
+    </div>
+    
+    <div class="study-table-wrap">
+      <div class="toolbar">
+        <button class="btn btn-accent" onclick="addChapter()">+ Add Chapter</button>
+      </div>
+      <table class="study-table">
+        <thead>
+          <tr>
+            <th>Chapter Name</th>
+            <th class="study-check">Theory</th>
+            <th class="study-check">Exercise</th>
+            <th class="study-check">PYQs</th>
+            <th class="study-check">Revised</th>
+          </tr>
+        </thead>
+        <tbody id="studyTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+/* --- STATE MANAGEMENT --- */
+let currentMainTab = 'Habits'; 
+let currentSubTab = 'Physics';
+
+const isc11Syllabus = {
+  Physics: [
+    "Physical World and Measurement", "Kinematics", "Laws of Motion", "Work, Energy and Power", 
+    "Motion of System of Particles and Rigid Body", "Gravitation", "Properties of Bulk Matter", 
+    "Thermodynamics", "Behaviour of Perfect Gases and Kinetic Theory of Gases", "Oscillations and Waves"
+  ],
+  Chemistry: [
+    "Some Basic Concepts of Chemistry", "Structure of Atom", "Classification of Elements and Periodicity", 
+    "Chemical Bonding and Molecular Structure", "States of Matter: Gases and Liquids", "Chemical Thermodynamics", 
+    "Equilibrium", "Redox Reactions", "Hydrogen", "s-Block Elements", "Some p-Block Elements", 
+    "Organic Chemistry - Basic Principles and Techniques", "Hydrocarbons", "Environmental Chemistry"
+  ],
+  Maths: [
+    "Sets and Functions", "Relations and Functions", "Trigonometry", "Principle of Mathematical Induction", 
+    "Complex Numbers and Quadratic Equations", "Linear Inequalities", "Permutations and Combinations", 
+    "Binomial Theorem", "Sequence and Series", "Straight Lines", "Conic Sections", "Introduction to 3D Geometry", 
+    "Limits and Derivatives", "Mathematical Reasoning", "Statistics", "Probability"
+  ]
+};
+
+const isc12Syllabus = {
+  Physics: [
+    "Electrostatics", "Current Electricity", "Magnetic Effects of Current and Magnetism", 
+    "Electromagnetic Induction and Alternating Currents", "Electromagnetic Waves", "Optics", 
+    "Dual Nature of Radiation and Matter", "Atoms and Nuclei", "Electronic Devices"
+  ],
+  Chemistry: [
+    "Solid State", "Solutions", "Electrochemistry", "Chemical Kinetics", "Surface Chemistry", 
+    "General Principles and Processes of Isolation of Elements", "p-Block Elements", "d- and f- Block Elements", 
+    "Coordination Compounds", "Haloalkanes and Haloarenes", "Alcohols, Phenols and Ethers", 
+    "Aldehydes, Ketones and Carboxylic Acids", "Organic Compounds containing Nitrogen", "Biomolecules", 
+    "Polymers", "Chemistry in Everyday Life"
+  ],
+  Maths: [
+    "Relations and Functions", "Inverse Trigonometric Functions", "Matrices", "Determinants", 
+    "Continuity and Differentiability", "Applications of Derivatives", "Integrals", "Differential Equations", 
+    "Probability", "Vectors", "Three-Dimensional Geometry", "Applications of Integrals", "Linear Regression"
+  ]
+};
+
+const fullSyllabusTemplate = {
+  Physics: [
+    "Units and Measurements", "Kinematics", "Laws of Motion", "Work, Energy and Power", 
+    "Rotational Motion", "Gravitation", "Properties of Solids and Liquids", "Thermodynamics", 
+    "Kinetic Theory of Gases", "Oscillations and Waves", "Electrostatics", "Current Electricity", 
+    "Magnetic Effects of Current and Magnetism", "Electromagnetic Induction and Alternating Currents", 
+    "Electromagnetic Waves", "Optics", "Dual Nature of Matter and Radiation", "Atoms and Nuclei", "Electronic Devices"
+  ],
+  Chemistry: [
+    "Some Basic Concepts in Chemistry", "Structure of Atom", "Classification of Elements and Periodicity", 
+    "Chemical Bonding and Molecular Structure", "Thermodynamics", "Equilibrium", "Redox Reactions", 
+    "s-Block Elements", "p-Block Elements", "d and f Block Elements", "Coordination Compounds", 
+    "Environmental Chemistry", "Purification and Characterisation of Organic Compounds", 
+    "Some Basic Principles of Organic Chemistry", "Hydrocarbons", "Haloalkanes and Haloarenes", 
+    "Alcohols, Phenols and Ethers", "Aldehydes, Ketones and Carboxylic Acids", "Organic Compounds Containing Nitrogen", 
+    "Biomolecules", "Principles Related to Practical Chemistry"
+  ],
+  Maths: [
+    "Sets, Relations and Functions", "Complex Numbers and Quadratic Equations", "Matrices and Determinants", 
+    "Permutations and Combinations", "Mathematical Induction", "Binomial Theorem", "Sequences and Series", 
+    "Limit, Continuity and Differentiability", "Integral Calculus", "Differential Equations", 
+    "Coordinate Geometry", "Three Dimensional Geometry", "Vector Algebra", "Statistics and Probability", 
+    "Trigonometry", "Mathematical Reasoning"
+  ]
+};
+
+let defaultStudyData = {
+  'ISC Class 11': JSON.parse(JSON.stringify(isc11Syllabus)),
+  'ISC Class 12': JSON.parse(JSON.stringify(isc12Syllabus)),
+  Mains: JSON.parse(JSON.stringify(fullSyllabusTemplate)),
+  Advanced: JSON.parse(JSON.stringify(fullSyllabusTemplate))
+};
+
+// Habit Data
+let habits = JSON.parse(localStorage.getItem('habits')) || ['Morning workout', 'Read 20 pages'];
+let habitChecks = JSON.parse(localStorage.getItem('habitChecks')) || {};
+
+// Study Data - Upgraded to V3 to load the new ISC 11 and 12 Syllabus structures properly
+let studyData = JSON.parse(localStorage.getItem('studyDataV3')) || defaultStudyData;
+let studyChecks = JSON.parse(localStorage.getItem('studyChecksV3')) || {};
+
+const now = new Date();
+let viewYear = now.getFullYear(), viewMonth = now.getMonth();
+
+/* --- CORE FUNCTIONS --- */
+function saveData() {
+  localStorage.setItem('habits', JSON.stringify(habits));
+  localStorage.setItem('habitChecks', JSON.stringify(habitChecks));
+  localStorage.setItem('studyDataV3', JSON.stringify(studyData));
+  localStorage.setItem('studyChecksV3', JSON.stringify(studyChecks));
+}
+
+function setMainTab(tab) {
+  currentMainTab = tab;
+  document.querySelectorAll('.main-tab').forEach(b => b.classList.toggle('active', b.innerText.includes(tab)));
+  
+  if (tab === 'Habits') {
+    document.getElementById('view-Habits').classList.add('active');
+    document.getElementById('view-Study').classList.remove('active');
+    renderHabits();
+  } else {
+    document.getElementById('view-Habits').classList.remove('active');
+    document.getElementById('view-Study').classList.add('active');
+    
+    const subjects = Object.keys(studyData[currentMainTab]);
+    if (!subjects.includes(currentSubTab) && subjects.length > 0) {
+      currentSubTab = subjects[0];
+    }
+    renderStudy();
+  }
+}
+
+function setSubTab(sub) { currentSubTab = sub; renderStudy(); }
+
+function addSubject() {
+  const sub = prompt(`Add new subject to ${currentMainTab}:`);
+  if(sub && sub.trim() !== '') {
+    studyData[currentMainTab][sub.trim()] = [];
+    currentSubTab = sub.trim();
+    saveData(); renderStudy();
+  }
+}
+
+function addChapter() {
+  const ch = prompt(`Add chapter to ${currentMainTab} - ${currentSubTab}:`);
+  if(ch && ch.trim() !== '') {
+    studyData[currentMainTab][currentSubTab].push(ch.trim());
+    saveData(); renderStudy();
+  }
+}
+
+function updateChapterName(oldName, newName) {
+  const trimmed = newName.trim();
+  if (!trimmed || trimmed === oldName) return;
+  
+  const idx = studyData[currentMainTab][currentSubTab].indexOf(oldName);
+  if (idx !== -1) {
+    studyData[currentMainTab][currentSubTab][idx] = trimmed;
+    
+    // Migrate associated progress checkmarks to the new chapter name
+    ['Theory','Ex','PYQ','Rev'].forEach(col => {
+      const oldKey = `${currentMainTab}-${currentSubTab}-${oldName}-${col}`;
+      const newKey = `${currentMainTab}-${currentSubTab}-${trimmed}-${col}`;
+      if (studyChecks[oldKey] !== undefined) {
+        studyChecks[newKey] = studyChecks[oldKey];
+        delete studyChecks[oldKey];
+      }
+    });
+    
+    saveData();
+    renderStudy();
+  }
+}
+
+function toggleStudyCheck(chapter, col) {
+  const key = `${currentMainTab}-${currentSubTab}-${chapter}-${col}`;
+  studyChecks[key] = !studyChecks[key];
+  saveData(); renderStudy();
+}
+
+/* --- HABIT TRACKER LOGIC --- */
+function hKey(hIdx, d) { return `${viewYear}-${viewMonth}-${hIdx}-${d}`; }
+function daysInMonth(y, m) { return new Date(y, m+1, 0).getDate(); }
+
+function renderHabits() {
+  const tot = daysInMonth(viewYear, viewMonth);
+  const head = document.getElementById('gridHead');
+  head.innerHTML = '<th class="habit-col">Habit</th>' + Array.from({length:tot}, (_,i)=>`<th>${i+1}</th>`).join('') + '<th>%</th>';
+  
+  const body = document.getElementById('gridBody');
+  body.innerHTML = '';
+  habits.forEach((h, i) => {
+    const tr = document.createElement('tr');
+    let row = `<td class="habit-name"><input value="${h}" onchange="updateHabitName(${i}, this.value)"></td>`;
+    let doneCount = 0;
+    for(let d=1; d<=tot; d++) {
+      const isDone = habitChecks[hKey(i,d)];
+      if(isDone) doneCount++;
+      row += `<td class="day-cell ${isDone?'done':''}" onclick="toggleHabitCell(${i},${d})"></td>`;
+    }
+    row += `<td style="text-align:center; font-weight:700;">${Math.round(doneCount/tot*100) || 0}%</td>`;
+    tr.innerHTML = row;
+    body.appendChild(tr);
+  });
+  document.getElementById('monthLabel').textContent = `${new Intl.DateTimeFormat('en-US', {month:'short'}).format(new Date(viewYear, viewMonth))} '${String(viewYear).slice(2)}`;
+  
+  updateHabitStats();
+  renderHabitCharts();
+}
+
+function updateHabitName(i, val) { habits[i] = val; saveData(); renderHabits(); }
+function toggleHabitCell(i, d) { const k = hKey(i,d); habitChecks[k] = !habitChecks[k]; saveData(); renderHabits(); }
+
+let hLineC;
+function renderHabitCharts() {
+  const tot = daysInMonth(viewYear, viewMonth);
+  const dailyData = Array.from({length:tot}, (_,d)=> habits.filter((_,i)=>habitChecks[hKey(i,d+1)]).length);
+  
+  if(hLineC) hLineC.destroy();
+  hLineC = new Chart(document.getElementById('lineChart'), {
+    type: 'line',
+    data: { labels: Array.from({length:tot},(_,i)=>i+1), datasets: [{ label: 'Daily Completion', data: dailyData, borderColor: '#3d6b4f', backgroundColor: 'rgba(61, 107, 79, 0.1)', fill: true, tension: 0.3 }] },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+  });
+}
+
+function updateHabitStats() {
+  let total = 0;
+  for(let k in habitChecks) if(habitChecks[k]) total++;
+  document.getElementById('stTotalChecks').textContent = total;
+  document.getElementById('stBestStreak').textContent = habits.length;
+  
+  const totPossible = daysInMonth(viewYear, viewMonth) * habits.length;
+  let curMonthDone = 0;
+  for(let i=0; i<habits.length; i++){
+      for(let d=1; d<=daysInMonth(viewYear, viewMonth); d++){
+          if(habitChecks[hKey(i,d)]) curMonthDone++;
+      }
+  }
+  document.getElementById('stAvgComp').textContent = totPossible ? Math.round((curMonthDone/totPossible)*100) + '%' : '0%';
+}
+
+/* --- STUDY TRACKER LOGIC --- */
+let studyPie;
+function renderStudy() {
+  const subjects = Object.keys(studyData[currentMainTab]);
+  const subContainer = document.getElementById('subTabsContainer');
+  subContainer.innerHTML = subjects.map(sub => 
+    `<div class="sub-tab ${sub === currentSubTab ? 'active' : ''}" onclick="setSubTab('${sub}')">${sub}</div>`
+  ).join('') + `<div class="sub-tab" style="background:transparent; border-style:dashed;" onclick="addSubject()">+ Subject</div>`;
+
+  document.getElementById('chartTitle').textContent = `${currentSubTab} Progress`;
+
+  const chapters = studyData[currentMainTab][currentSubTab] || [];
+  const tbody = document.getElementById('studyTableBody');
+  
+  if (chapters.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">No chapters added yet. Click "+ Add Chapter" to start building your syllabus.</div></td></tr>`;
+  } else {
+    tbody.innerHTML = chapters.map(ch => {
+      const escapedCh = ch.replace(/"/g, '&quot;');
+      return `
+      <tr>
+        <td><input type="text" class="chapter-input" value="${escapedCh}" onchange="updateChapterName('${escapedCh}', this.value)"></td>
+        ${['Theory','Ex','PYQ','Rev'].map(col => `
+          <td class="study-check ${studyChecks[`${currentMainTab}-${currentSubTab}-${ch}-${col}`] ? 'done' : ''}" 
+              onclick="toggleStudyCheck('${escapedCh}', '${col}')"></td>
+        `).join('')}
+      </tr>
+    `}).join('');
+  }
+
+  let totalItems = chapters.length * 4;
+  let doneItems = 0;
+  chapters.forEach(ch => {
+    ['Theory','Ex','PYQ','Rev'].forEach(col => {
+      if(studyChecks[`${currentMainTab}-${currentSubTab}-${ch}-${col}`]) doneItems++;
+    });
+  });
+
+  const percent = totalItems === 0 ? 0 : Math.round((doneItems/totalItems)*100);
+  
+  if(studyPie) studyPie.destroy();
+  const ctx = document.getElementById('studyPieChart');
+  studyPie = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [percent, 100-percent],
+        backgroundColor: ['#3d6b4f', getComputedStyle(document.body).getPropertyValue('--border')],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      cutout: '75%',
+      plugins: { tooltip: {enabled: false} }
+    },
+    plugins: [{
+      id: 'textCenter',
+      beforeDraw: function(chart) {
+        var width = chart.width, height = chart.height, ctx = chart.ctx;
+        ctx.restore();
+        var fontSize = (height / 114).toFixed(2);
+        ctx.font = "bold " + fontSize + "em Syne";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text');
+        var text = percent + "%", textX = Math.round((width - ctx.measureText(text).width) / 2), textY = height / 2;
+        ctx.fillText(text, textX, textY);
+        ctx.save();
+      }
+    }]
+  });
+}
+
+/* --- EVENT LISTENERS & INIT --- */
+document.getElementById('themeToggle').onclick = () => {
+  const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  if(currentMainTab === 'Habits') { renderHabits(); } else { renderStudy(); }
+};
+
+document.getElementById('addHabit').onclick = () => { habits.push('New Habit'); saveData(); renderHabits(); };
+document.getElementById('prevM').onclick = () => { viewMonth--; if(viewMonth<0){viewMonth=11; viewYear--;} renderHabits(); };
+document.getElementById('nextM').onclick = () => { viewMonth++; if(viewMonth>11){viewMonth=0; viewYear++;} renderHabits(); };
+
+// Initialize App
+setMainTab('Habits');
+
+</script>
+</body>
+</html>
