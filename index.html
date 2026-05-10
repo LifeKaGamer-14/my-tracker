@@ -26,7 +26,7 @@
   .sub { font-size: 13px; color: var(--muted); font-family: 'DM Mono', monospace; }
   
   .header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
-  .controls { display: flex; gap: 8px; align-items: center; }
+  .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;}
   
   .btn { border: 0.5px solid var(--border); border-radius: 6px; padding: 8px 14px; font-size: 13px; background: var(--surface); color: var(--text); cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 500; }
   .btn:hover { background: var(--bg); }
@@ -34,7 +34,7 @@
   .btn-accent:hover { background: var(--accent); opacity: 0.9; }
   .btn-google { background: #4285F4; color: white; border: none; display: flex; align-items: center; gap: 5px;}
   .btn-google:hover { background: #357ae8; }
-  .user-info { font-size: 12px; font-family: 'DM Mono'; color: var(--accent); display: none; }
+  .user-info { font-size: 12px; font-family: 'DM Mono'; color: var(--accent); display: none; background: rgba(61, 107, 79, 0.1); padding: 6px 12px; border-radius: 20px;}
 
   /* Main Tabs */
   .main-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
@@ -107,7 +107,8 @@
     <p class="sub"> Dashboard: Habits, Boards & JEE.</p>
   </div>
   <div class="controls">
-    <span id="userInfo" class="user-info">Synced</span>
+    <span id="userInfo" class="user-info">Not Logged In</span>
+    <button class="btn btn-accent" id="forceSyncBtn" style="display:none;">☁️ Sync Data</button>
     <button class="btn btn-google" id="loginBtn">Log in with Google to Sync</button>
     <button class="btn" id="logoutBtn" style="display:none;">Log Out</button>
     <button class="btn" id="themeToggle">🌓</button>
@@ -237,6 +238,8 @@ let viewYear = now.getFullYear(), viewMonth = now.getMonth();
 /* =========================================
    2. SYNC LOGIC
    ========================================= */
+
+// Saves locally and quietly pushes to cloud in the background
 function saveData() {
   localStorage.setItem('habits', JSON.stringify(habits));
   localStorage.setItem('habitChecks', JSON.stringify(habitChecks));
@@ -250,51 +253,76 @@ function saveData() {
       studyData: studyData,
       studyChecks: studyChecks,
       lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-    }).catch(error => console.error("Error syncing:", error));
+    }).catch(error => console.error("Background sync error:", error));
   }
 }
 
+// Manual Sync Button Logic
 if(auth) {
+  document.getElementById('forceSyncBtn').onclick = () => {
+    if(currentUser && db) {
+      document.getElementById('forceSyncBtn').innerText = "Syncing...";
+      db.collection('users').doc(currentUser.uid).set({
+        habits: habits,
+        habitChecks: habitChecks,
+        studyData: studyData,
+        studyChecks: studyChecks,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        document.getElementById('forceSyncBtn').innerText = "☁️ Sync Data";
+        alert("✅ Data successfully synced to: " + currentUser.email);
+      }).catch(error => {
+        document.getElementById('forceSyncBtn').innerText = "☁️ Sync Data";
+        alert("Error syncing data: " + error.message);
+      });
+    }
+  };
+
   auth.onAuthStateChanged(user => {
     if (user) {
       currentUser = user;
       document.getElementById('loginBtn').style.display = 'none';
       document.getElementById('logoutBtn').style.display = 'inline-block';
-      document.getElementById('userInfo').style.display = 'inline-block';
-      document.getElementById('userInfo').innerText = `Synced: ${user.email}`;
+      document.getElementById('forceSyncBtn').style.display = 'inline-block';
+      
+      const emailBox = document.getElementById('userInfo');
+      emailBox.style.display = 'inline-block';
+      emailBox.innerText = `Logged in: ${user.email}`;
 
- db.collection('users').doc(user.uid).get().then(doc => {
-  if (doc.exists) {
-    const data = doc.data();
-    if(data.habits) habits = data.habits;
-    if(data.habitChecks) habitChecks = data.habitChecks;
-    if(data.studyData) studyData = data.studyData;
-    if(data.studyChecks) studyChecks = data.studyChecks;
+      // Download from cloud to device on login
+      db.collection('users').doc(user.uid).get().then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          if(data.habits) habits = data.habits;
+          if(data.habitChecks) habitChecks = data.habitChecks;
+          if(data.studyData) studyData = data.studyData;
+          if(data.studyChecks) studyChecks = data.studyChecks;
+          
+          localStorage.setItem('habits', JSON.stringify(habits));
+          localStorage.setItem('habitChecks', JSON.stringify(habitChecks));
+          localStorage.setItem('studyDataV3', JSON.stringify(studyData));
+          localStorage.setItem('studyChecksV3', JSON.stringify(studyChecks));
 
-    // Sync to local memory without triggering a write-back to Firebase
-    localStorage.setItem('habits', JSON.stringify(habits));
-    localStorage.setItem('habitChecks', JSON.stringify(habitChecks));
-    localStorage.setItem('studyDataV3', JSON.stringify(studyData));
-    localStorage.setItem('studyChecksV3', JSON.stringify(studyChecks));
-
-    if(currentMainTab === 'Habits') renderHabits(); else renderStudy();
-  }
-});
+          if(currentMainTab === 'Habits') renderHabits(); else renderStudy();
+        }
+      });
     } else {
       currentUser = null;
       document.getElementById('loginBtn').style.display = 'inline-block';
       document.getElementById('logoutBtn').style.display = 'none';
+      document.getElementById('forceSyncBtn').style.display = 'none';
       document.getElementById('userInfo').style.display = 'none';
     }
   });
 
   document.getElementById('loginBtn').onclick = () => {
     const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(error => alert(error.message));
+    auth.signInWithPopup(provider).catch(error => alert("Login failed: " + error.message));
   };
 
   document.getElementById('logoutBtn').onclick = () => {
     auth.signOut();
+    alert("Logged out. Changes will now only save to this device.");
   };
 }
 
