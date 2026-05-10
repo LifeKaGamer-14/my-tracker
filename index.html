@@ -263,17 +263,23 @@ if(auth) {
       document.getElementById('userInfo').style.display = 'inline-block';
       document.getElementById('userInfo').innerText = `Synced: ${user.email}`;
 
-      db.collection('users').doc(user.uid).get().then(doc => {
-        if (doc.exists) {
-          const data = doc.data();
-          if(data.habits) habits = data.habits;
-          if(data.habitChecks) habitChecks = data.habitChecks;
-          if(data.studyData) studyData = data.studyData;
-          if(data.studyChecks) studyChecks = data.studyChecks;
-          saveData(); 
-          if(currentMainTab === 'Habits') renderHabits(); else renderStudy();
-        }
-      });
+ db.collection('users').doc(user.uid).get().then(doc => {
+  if (doc.exists) {
+    const data = doc.data();
+    if(data.habits) habits = data.habits;
+    if(data.habitChecks) habitChecks = data.habitChecks;
+    if(data.studyData) studyData = data.studyData;
+    if(data.studyChecks) studyChecks = data.studyChecks;
+
+    // Sync to local memory without triggering a write-back to Firebase
+    localStorage.setItem('habits', JSON.stringify(habits));
+    localStorage.setItem('habitChecks', JSON.stringify(habitChecks));
+    localStorage.setItem('studyDataV3', JSON.stringify(studyData));
+    localStorage.setItem('studyChecksV3', JSON.stringify(studyChecks));
+
+    if(currentMainTab === 'Habits') renderHabits(); else renderStudy();
+  }
+});
     } else {
       currentUser = null;
       document.getElementById('loginBtn').style.display = 'inline-block';
