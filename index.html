@@ -36,6 +36,10 @@
     .btn-google { background: #4285F4; color: white; border: none; display: flex; align-items: center; gap: 5px;}
     .btn-google:hover { background: #357ae8; }
     .user-info { font-size: 12px; font-family: 'DM Mono'; color: var(--accent); display: none; background: rgba(61, 107, 79, 0.1); padding: 6px 12px; border-radius: 20px;}
+    
+    /* Dropdown specific */
+    select.btn { appearance: none; -webkit-appearance: none; padding-right: 25px; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%237a7870%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 10px auto; }
+    [data-theme="dark"] select.btn { background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a0a0a0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); }
 
     /* Main Tabs */
     .main-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
@@ -103,7 +107,7 @@
     <div>
       <h1>Console & Campus</h1>
       <div class="creator-tag">Created by FARHAN HAIDER KHAN / LIFEKAGAMER</div>
-      <p class="sub">Dashboard: Habits, Boards & JEE.</p>
+      <p class="sub">Dashboard: Habits, Boards & Prep.</p>
     </div>
 
     <div class="controls">
@@ -111,6 +115,12 @@
       <button class="btn btn-accent" id="forceSyncBtn" style="display:none;">☁️ Sync Data</button>
       <button class="btn btn-google" id="loginBtn">Log in to Sync</button>
       <button class="btn" id="logoutBtn" style="display:none;">Log Out</button>
+      
+      <select id="examTargetSelect" class="btn" onchange="switchExamTrack(this.value)">
+        <option value="JEE">Target: JEE (PCM)</option>
+        <option value="NEET">Target: NEET (PCB)</option>
+      </select>
+
       <button class="btn" id="themeToggle">🌓</button>
     </div>
   </div>
@@ -119,8 +129,11 @@
     <button class="main-tab active" onclick="setMainTab('Habits')">Habit Tracker</button>
     <button class="main-tab" onclick="setMainTab('ISC Class 11')">ISC Class 11</button>
     <button class="main-tab" onclick="setMainTab('ISC Class 12')">ISC Class 12</button>
-    <button class="main-tab" onclick="setMainTab('Mains')">JEE Mains</button>
-    <button class="main-tab" onclick="setMainTab('Advanced')">JEE Advanced</button>
+    
+    <button class="main-tab exam-jee" onclick="setMainTab('Mains')">JEE Mains</button>
+    <button class="main-tab exam-jee" onclick="setMainTab('Advanced')">JEE Advanced</button>
+    
+    <button class="main-tab exam-neet" onclick="setMainTab('NEET')" style="display:none;">NEET Tracker</button>
   </div>
 
   <div id="view-Habits" class="view-section active">
@@ -199,7 +212,6 @@
     measurementId: "G-JGNP68098P"
   };
 
-  // Initialize Firebase
   let auth, db, currentUser = null;
   try {
     firebase.initializeApp(firebaseConfig);
@@ -212,26 +224,48 @@
   /* --- STATE MANAGEMENT --- */
   let currentMainTab = 'Habits'; 
   let currentSubTab = 'Physics';
+  let currentExamTrack = localStorage.getItem('examTrack') || 'JEE';
 
   // Default Data Templates
   const isc11Syllabus = {
     Physics: ["Physical World and Measurement", "Kinematics", "Laws of Motion", "Work, Energy and Power", "Motion of System of Particles and Rigid Body", "Gravitation", "Properties of Bulk Matter", "Thermodynamics", "Behaviour of Perfect Gases and Kinetic Theory of Gases", "Oscillations and Waves"],
     Chemistry: ["Some Basic Concepts of Chemistry", "Structure of Atom", "Classification of Elements and Periodicity", "Chemical Bonding and Molecular Structure", "States of Matter: Gases and Liquids", "Chemical Thermodynamics", "Equilibrium", "Redox Reactions", "Hydrogen", "s-Block Elements", "Some p-Block Elements", "Organic Chemistry - Basic Principles and Techniques", "Hydrocarbons", "Environmental Chemistry"],
-    Maths: ["Sets and Functions", "Relations and Functions", "Trigonometry", "Principle of Mathematical Induction", "Complex Numbers and Quadratic Equations", "Linear Inequalities", "Permutations and Combinations", "Binomial Theorem", "Sequence and Series", "Straight Lines", "Conic Sections", "Introduction to 3D Geometry", "Limits and Derivatives", "Mathematical Reasoning", "Statistics", "Probability"]
+    Maths: ["Sets and Functions", "Relations and Functions", "Trigonometry", "Principle of Mathematical Induction", "Complex Numbers and Quadratic Equations", "Linear Inequalities", "Permutations and Combinations", "Binomial Theorem", "Sequence and Series", "Straight Lines", "Conic Sections", "Introduction to 3D Geometry", "Limits and Derivatives", "Mathematical Reasoning", "Statistics", "Probability"],
+    Biology: ["Diversity of Living Organisms", "Structural Organisation in Animals and Plants", "Cell: Structure and Function", "Plant Physiology", "Human Physiology"]
+  };
+
+  const isc12Syllabus = {
+    Physics: ["Electrostatics", "Current Electricity", "Magnetic Effects of Current and Magnetism", "Electromagnetic Induction and Alternating Currents", "Electromagnetic Waves", "Optics", "Dual Nature of Radiation and Matter", "Atoms and Nuclei", "Electronic Devices"],
+    Chemistry: ["Solid State", "Solutions", "Electrochemistry", "Chemical Kinetics", "Surface Chemistry", "General Principles and Processes of Isolation of Elements", "p-Block Elements", "d- and f- Block Elements", "Coordination Compounds", "Haloalkanes and Haloarenes", "Alcohols, Phenols and Ethers", "Aldehydes, Ketones and Carboxylic Acids", "Organic Compounds containing Nitrogen", "Biomolecules", "Polymers", "Chemistry in Everyday Life"],
+    Maths: ["Relations and Functions", "Inverse Trigonometric Functions", "Matrices", "Determinants", "Continuity and Differentiability", "Applications of Derivatives", "Integrals", "Differential Equations", "Probability", "Vectors", "Three-Dimensional Geometry", "Applications of Integrals", "Linear Regression"],
+    Biology: ["Reproduction", "Genetics and Evolution", "Biology and Human Welfare", "Biotechnology and its Applications", "Ecology and Environment"]
+  };
+  
+  const neetSyllabus = {
+    Physics: ["Physical World and Measurement", "Kinematics", "Laws of Motion", "Work, Energy and Power", "Motion of System of Particles and Rigid Body", "Gravitation", "Properties of Bulk Matter", "Thermodynamics", "Behaviour of Perfect Gases and Kinetic Theory of Gases", "Oscillations and Waves", "Electrostatics", "Current Electricity", "Magnetic Effects of Current and Magnetism", "Electromagnetic Induction and Alternating Currents", "Electromagnetic Waves", "Optics", "Dual Nature of Radiation and Matter", "Atoms and Nuclei", "Electronic Devices"],
+    Chemistry: ["Some Basic Concepts of Chemistry", "Structure of Atom", "Classification of Elements and Periodicity", "Chemical Bonding and Molecular Structure", "Thermodynamics", "Equilibrium", "Redox Reactions", "p-Block Elements", "d- and f-Block Elements", "Coordination Compounds", "Organic Chemistry - Basic Principles and Techniques", "Hydrocarbons", "Haloalkanes and Haloarenes", "Alcohols, Phenols and Ethers", "Aldehydes, Ketones and Carboxylic Acids", "Organic Compounds containing Nitrogen", "Biomolecules"],
+    Biology: ["Diversity in Living World", "Structural Organisation in Animals and Plants", "Cell Structure and Function", "Plant Physiology", "Human Physiology", "Reproduction", "Genetics and Evolution", "Biology and Human Welfare", "Biotechnology and Its Applications", "Ecology and Environment"]
   };
 
   const defaultStudyData = {
     'ISC Class 11': JSON.parse(JSON.stringify(isc11Syllabus)),
-    'ISC Class 12': { Physics: ["Electrostatics", "Current Electricity", "Optics"], Chemistry: ["Solid State", "Solutions", "Electrochemistry"], Maths: ["Relations and Functions", "Matrices", "Calculus"] },
+    'ISC Class 12': JSON.parse(JSON.stringify(isc12Syllabus)),
     Mains: { Physics: ["Units and Measurements", "Kinematics"], Chemistry: ["Some Basic Concepts in Chemistry"], Maths: ["Sets, Relations and Functions"] },
-    Advanced: { Physics: ["Mechanics"], Chemistry: ["Physical Chemistry"], Maths: ["Algebra"] }
+    Advanced: { Physics: ["Mechanics"], Chemistry: ["Physical Chemistry"], Maths: ["Algebra"] },
+    NEET: JSON.parse(JSON.stringify(neetSyllabus))
   };
 
-  // Load Initial Offline Data (Fallbacks)
+  // Load Initial Offline Data
   let habits = JSON.parse(localStorage.getItem('habits')) || ['Morning workout', 'Read 20 pages'];
   let habitChecks = JSON.parse(localStorage.getItem('habitChecks')) || {};
   let studyData = JSON.parse(localStorage.getItem('studyDataV3')) || defaultStudyData;
   let studyChecks = JSON.parse(localStorage.getItem('studyChecksV3')) || {};
+  
+  // Inject missing chapters into older saves to prevent errors
+  if (!studyData.NEET) studyData.NEET = JSON.parse(JSON.stringify(neetSyllabus));
+  if (!studyData['ISC Class 11'].Biology) studyData['ISC Class 11'].Biology = [...isc11Syllabus.Biology];
+  if (!studyData['ISC Class 12'].Biology) studyData['ISC Class 12'].Biology = [...isc12Syllabus.Biology];
+  if (!studyData['ISC Class 12'].Maths) studyData['ISC Class 12'].Maths = [...isc12Syllabus.Maths];
 
   const now = new Date();
   let viewYear = now.getFullYear(), viewMonth = now.getMonth();
@@ -239,13 +273,12 @@
   /* =========================================
      2. SYNC LOGIC
      ========================================= */
-
-  // Saves locally and quietly pushes to cloud in the background
   function saveData() {
     localStorage.setItem('habits', JSON.stringify(habits));
     localStorage.setItem('habitChecks', JSON.stringify(habitChecks));
     localStorage.setItem('studyDataV3', JSON.stringify(studyData));
     localStorage.setItem('studyChecksV3', JSON.stringify(studyChecks));
+    localStorage.setItem('examTrack', currentExamTrack);
 
     if(currentUser && db) {
       db.collection('users').doc(currentUser.uid).set({
@@ -253,12 +286,12 @@
         habitChecks: habitChecks,
         studyData: studyData,
         studyChecks: studyChecks,
+        examTrack: currentExamTrack,
         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
       }).catch(error => console.error("Background sync error:", error));
     }
   }
 
-  // Manual Sync Button Logic
   if(auth) {
     document.getElementById('forceSyncBtn').onclick = () => {
       if(currentUser && db) {
@@ -268,6 +301,7 @@
           habitChecks: habitChecks,
           studyData: studyData,
           studyChecks: studyChecks,
+          examTrack: currentExamTrack,
           lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
         }).then(() => {
           document.getElementById('forceSyncBtn').innerText = "☁️ Sync Data";
@@ -290,19 +324,29 @@
         emailBox.style.display = 'inline-block';
         emailBox.innerText = `Logged in: ${user.email}`;
 
-        // Download from cloud to device on login
         db.collection('users').doc(user.uid).get().then(doc => {
           if (doc.exists) {
             const data = doc.data();
             if(data.habits) habits = data.habits;
             if(data.habitChecks) habitChecks = data.habitChecks;
-            if(data.studyData) studyData = data.studyData;
+            if(data.studyData) {
+              studyData = data.studyData;
+              if (!studyData.NEET) studyData.NEET = JSON.parse(JSON.stringify(neetSyllabus));
+              if (!studyData['ISC Class 11'].Biology) studyData['ISC Class 11'].Biology = [...isc11Syllabus.Biology];
+              if (!studyData['ISC Class 12'].Biology) studyData['ISC Class 12'].Biology = [...isc12Syllabus.Biology];
+              if (!studyData['ISC Class 12'].Maths) studyData['ISC Class 12'].Maths = [...isc12Syllabus.Maths];
+            }
             if(data.studyChecks) studyChecks = data.studyChecks;
+            if(data.examTrack) {
+              currentExamTrack = data.examTrack;
+              switchExamTrack(currentExamTrack);
+            }
             
             localStorage.setItem('habits', JSON.stringify(habits));
             localStorage.setItem('habitChecks', JSON.stringify(habitChecks));
             localStorage.setItem('studyDataV3', JSON.stringify(studyData));
             localStorage.setItem('studyChecksV3', JSON.stringify(studyChecks));
+            localStorage.setItem('examTrack', currentExamTrack);
 
             if(currentMainTab === 'Habits') renderHabits(); else renderStudy();
           }
@@ -327,7 +371,27 @@
     };
   }
 
-  /* --- TAB ROUTING --- */
+  /* --- TAB ROUTING & PREFERENCES --- */
+  function switchExamTrack(track) {
+    currentExamTrack = track;
+    document.getElementById('examTargetSelect').value = track;
+    saveData();
+    
+    // Toggle Competitive Tabs
+    if (track === 'JEE') {
+      document.querySelectorAll('.exam-jee').forEach(el => el.style.display = 'inline-block');
+      document.querySelectorAll('.exam-neet').forEach(el => el.style.display = 'none');
+      if (currentMainTab === 'NEET') setMainTab('Mains');
+    } else {
+      document.querySelectorAll('.exam-jee').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.exam-neet').forEach(el => el.style.display = 'inline-block');
+      if (currentMainTab === 'Mains' || currentMainTab === 'Advanced') setMainTab('NEET');
+    }
+    
+    // Refresh to handle Math/Bio visibility
+    if (currentMainTab !== 'Habits') renderStudy();
+  }
+
   function setMainTab(tab) {
     currentMainTab = tab;
     document.querySelectorAll('.main-tab').forEach(b => b.classList.toggle('active', b.innerText.includes(tab)));
@@ -339,11 +403,6 @@
     } else {
       document.getElementById('view-Habits').classList.remove('active');
       document.getElementById('view-Study').classList.add('active');
-      
-      const subjects = Object.keys(studyData[currentMainTab] || {});
-      if (!subjects.includes(currentSubTab) && subjects.length > 0) {
-        currentSubTab = subjects[0];
-      }
       renderStudy();
     }
   }
@@ -453,7 +512,21 @@
   /* --- STUDY TRACKER LOGIC --- */
   let studyPie;
   function renderStudy() {
-    const subjects = Object.keys(studyData[currentMainTab] || {});
+    let subjects = Object.keys(studyData[currentMainTab] || {});
+    
+    // Filter out Biology/Maths dynamically based on exam track
+    if (currentMainTab === 'ISC Class 11' || currentMainTab === 'ISC Class 12') {
+      if (currentExamTrack === 'NEET') {
+        subjects = subjects.filter(sub => sub !== 'Maths');
+      } else {
+        subjects = subjects.filter(sub => sub !== 'Biology');
+      }
+    }
+
+    if (!subjects.includes(currentSubTab) && subjects.length > 0) {
+      currentSubTab = subjects[0];
+    }
+
     const subContainer = document.getElementById('subTabsContainer');
     subContainer.innerHTML = subjects.map(sub => 
       `<div class="sub-tab ${sub === currentSubTab ? 'active' : ''}" onclick="setSubTab('${sub}')">${sub}</div>`
@@ -527,6 +600,8 @@
   document.getElementById('prevM').onclick = () => { viewMonth--; if(viewMonth<0){viewMonth=11; viewYear--;} renderHabits(); };
   document.getElementById('nextM').onclick = () => { viewMonth++; if(viewMonth>11){viewMonth=0; viewYear++;} renderHabits(); };
 
+  // Run on Boot
+  switchExamTrack(currentExamTrack);
   setMainTab('Habits');
 
   </script>
