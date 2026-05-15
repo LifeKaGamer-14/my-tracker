@@ -11,17 +11,38 @@
     :root {
       --bg: #f8f7f4; --surface: #fff; --border: #e2e0d9; --accent: #3d6b4f;
       --accent2: #c97d3e; --text: #1a1a18; --muted: #7a7870; --cell: 28px;
-      --chart-grid: rgba(0,0,0,0.05);
+      --chart-grid: rgba(0,0,0,0.05); --danger: #d9534f; --xp-color: #f39c12;
     }
 
     [data-theme="dark"] {
       --bg: #121212; --surface: #1e1e1e; --border: #333; --accent: #82b394;
-      --accent2: #e09d62; --text: #e0e0e0; --muted: #a0a0a0;
-      --chart-grid: rgba(255,255,255,0.1);
+      --accent2: #e09d62; --text: #e0e0e0; --muted: #a0a0a0; --danger: #ff6b6b;
+      --chart-grid: rgba(255,255,255,0.1); --xp-color: #f1c40f;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.2s, color 0.2s; }
-    body { background: var(--bg); font-family: 'Syne', sans-serif; color: var(--text); padding: 1.5rem; }
+    /* Unlockable Themes */
+    [data-theme="terminal"] {
+      --bg: #0a0a0a; --surface: #111; --border: #003300; --accent: #00ff00;
+      --accent2: #00cc00; --text: #00ff00; --muted: #006600; --danger: #ff0000;
+      --chart-grid: rgba(0,255,0,0.1); --xp-color: #00ff00;
+      font-family: 'DM Mono', monospace;
+    }
+    [data-theme="terminal"] * { font-family: 'DM Mono', monospace !important; }
+
+   [data-theme="survival"] {
+      --bg: #0d0000; /* Deep void black */
+      --surface: #1a0505; /* Dark obsidian red */
+      --border: #4a0404; /* Crimson block border */
+      --accent: #ff2a2a; /* Glowing health/lava red */
+      --accent2: #ff7300; /* Fire orange */
+      --text: #ffe6e6; /* Pale red-white for readability */
+      --muted: #8c3333; /* Faded blood red */
+      --danger: #ff0000; /* Pure red */
+      --xp-color: #ff4500; /* Hot lava orange */
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.2s, border-color 0.2s; }
+    body { background: var(--bg); font-family: 'Syne', sans-serif; color: var(--text); padding: 1.5rem; padding-bottom: 80px;}
     h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px;}
     .creator-tag { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--accent); font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;}
     .sub { font-size: 13px; color: var(--muted); font-family: 'DM Mono', monospace; }
@@ -32,14 +53,19 @@
     .btn { border: 0.5px solid var(--border); border-radius: 6px; padding: 8px 14px; font-size: 13px; background: var(--surface); color: var(--text); cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 500; }
     .btn:hover { background: var(--bg); }
     .btn-accent { border: none; background: var(--accent); color: white; }
-    .btn-accent:hover { background: var(--accent); opacity: 0.9; }
+    .btn-accent:hover { background: var(--accent); opacity: 0.9; color: white; }
     .btn-google { background: #4285F4; color: white; border: none; display: flex; align-items: center; gap: 5px;}
-    .btn-google:hover { background: #357ae8; }
     .user-info { font-size: 12px; font-family: 'DM Mono'; color: var(--accent); display: none; background: rgba(61, 107, 79, 0.1); padding: 6px 12px; border-radius: 20px;}
     
-    /* Dropdown specific */
     select.btn { appearance: none; -webkit-appearance: none; padding-right: 25px; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%237a7870%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 10px auto; }
-    [data-theme="dark"] select.btn { background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a0a0a0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); }
+    [data-theme="dark"] select.btn, [data-theme="terminal"] select.btn, [data-theme="survival"] select.btn { background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a0a0a0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); }
+
+    /* Gamification Top Bar */
+    .gamification-bar { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: var(--surface); padding: 12px 20px; border-radius: 12px; border: 0.5px solid var(--border); }
+    .level-badge { font-weight: bold; color: var(--bg); background: var(--accent); padding: 5px 10px; border-radius: 8px; font-size: 14px; font-family: 'DM Mono'; text-transform: uppercase;}
+    .xp-bar-wrap { flex-grow: 1; height: 10px; background: var(--bg); border-radius: 10px; overflow: hidden; border: 0.5px solid var(--border);}
+    .xp-fill { height: 100%; background: var(--xp-color); width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    .xp-text { font-family: 'DM Mono'; font-size: 12px; color: var(--muted); min-width: 80px; text-align: right;}
 
     /* Main Tabs */
     .main-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
@@ -48,7 +74,14 @@
 
     .view-section { display: none; animation: fadeIn 0.3s; }
     .view-section.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px);} to { opacity: 1; transform: translateY(0);} }
+
+    /* Today's Focus Widget */
+    .focus-widget { background: rgba(61, 107, 79, 0.05); border: 1px dashed var(--accent); border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+    .focus-widget h3 { font-size: 14px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    .focus-list { display: flex; gap: 10px; flex-wrap: wrap; }
+    .focus-item { background: var(--surface); border: 0.5px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-family: 'DM Mono'; cursor: pointer; }
+    .focus-item:hover { border-color: var(--accent); color: var(--accent); }
 
     /* Habit Tracker Styles */
     .tracker-wrap { overflow-x: auto; margin-bottom: 1.5rem; border-radius: 8px; border: 0.5px solid var(--border); }
@@ -58,12 +91,15 @@
     table.grid thead th.habit-col { text-align: left; padding: 10px; min-width: 180px; font-family: 'Syne', sans-serif; font-size: 12px; }
     
     .habit-name input { border: none; outline: none; background: transparent; font-size: 13px; font-family: 'Syne', sans-serif; color: var(--text); width: 100%; }
-    .day-cell { text-align: center; cursor: pointer; height: var(--cell); min-width: var(--cell); }
+    .day-cell { text-align: center; cursor: pointer; height: var(--cell); min-width: var(--cell); user-select: none; }
+    .day-cell:hover { background: var(--bg); }
     .day-cell.done { background: var(--accent); opacity: 0.3; position: relative; }
     .day-cell.done::after { content: '✓'; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: var(--text); font-weight: 700; opacity: 1; }
+    .day-cell.rest { background: var(--bg); position: relative; opacity: 0.7;}
+    .day-cell.rest::after { content: '☕'; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 10px; opacity: 0.5; }
     
     .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
-    .stat { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 16px; }
+    .stat { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 16px; position: relative; overflow: hidden;}
     .stat .s-val { font-size: 24px; font-weight: 700; color: var(--accent); }
     .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
     .chart-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem; }
@@ -74,7 +110,6 @@
     .sub-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
     
     .study-dashboard { display: grid; grid-template-columns: 250px 1fr; gap: 20px; }
-    
     .study-chart-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .pie-container { height: 180px; width: 100%; position: relative; display: flex; justify-content: center; margin-top: 15px; }
     
@@ -86,85 +121,40 @@
     .study-table td:last-child, .study-table th:last-child { border-right: none; }
     .study-table tr:last-child td { border-bottom: none; }
     
-    .chapter-input { border: none; background: transparent; font-family: inherit; font-size: 13px; color: var(--text); width: 100%; outline: none; padding: 4px; margin: -4px; border-radius: 4px; transition: 0.2s ease; }
-    .chapter-input:hover, .chapter-input:focus { background: var(--bg); }
-    .chapter-input:focus { color: var(--accent); border-bottom: 1px dashed var(--accent); border-radius: 4px 4px 0 0; }
+    .chapter-input { border: none; background: transparent; font-family: inherit; font-size: 13px; color: var(--text); width: 100%; outline: none; padding: 4px; margin: -4px; border-radius: 4px; }
+    .chapter-input:focus { color: var(--accent); border-bottom: 1px dashed var(--accent); }
     
-    .study-check { text-align: center; cursor: pointer; width: 70px; font-weight: bold; }
+    .study-check { text-align: center; cursor: pointer; width: 70px; font-weight: bold; position: relative; user-select: none;}
+    .study-check:hover { background: var(--bg); }
     .study-check.done { background: rgba(61, 107, 79, 0.15); color: var(--accent); }
     .study-check.done::after { content: '✓'; }
+    .study-check.needs-rev { background: rgba(217, 83, 79, 0.1); color: var(--danger); }
+    .study-check.needs-rev::after { content: '!'; }
+    .study-check.needs-rev::before { content: 'Overdue'; position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: var(--danger); color: white; font-size: 9px; padding: 2px 4px; border-radius: 4px; display: none; font-family: 'DM Mono'; z-index: 10;}
+    .study-check.needs-rev:hover::before { display: block; }
+    
     .empty-state { padding: 40px; text-align: center; color: var(--muted); font-size: 14px; font-style: italic; }
     .toolbar { padding: 15px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: flex-end; }
 
-    /* =========================================
-       MOBILE & RESPONSIVE ENHANCEMENTS 
-       ========================================= */
+    /* Pomodoro Timer */
+    .pomodoro-widget { position: fixed; bottom: 20px; right: 20px; background: var(--surface); border: 2px solid var(--accent); border-radius: 16px; padding: 15px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 15px; z-index: 1000; }
+    .pomo-time { font-size: 24px; font-weight: 700; font-family: 'DM Mono'; color: var(--accent); width: 80px; text-align: center;}
+    .pomo-controls button { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text); padding: 5px; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
+    .pomo-controls button:hover { background: var(--bg); }
+
     @media (max-width: 768px) {
-      /* 1. Stack header and controls for better spacing */
-      .header-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-      }
-      .controls {
-        width: 100%;
-        justify-content: space-between;
-      }
-
-      /* 2. Improve Main Tabs for touch screens */
-      .main-tabs {
-        padding-bottom: 15px; 
-        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-      }
-      .main-tab {
-        font-size: 14px;
-        padding: 8px 12px;
-      }
-
-      /* 3. Make the Habit Tracker "Sticky" */
-      .tracker-wrap {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        border-radius: 8px;
-        box-shadow: inset -10px 0 10px -10px rgba(0,0,0,0.1);
-      }
-      table.grid th.habit-col, 
-      table.grid td.habit-name {
-        position: sticky;
-        left: 0;
-        z-index: 2;
-        background: var(--surface); /* Inherits theme background */
-        box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-      }
-      
-      /* 4. Optimize the Study Dashboard */
-      .study-dashboard {
-        grid-template-columns: 1fr; /* Stacks chart above the table */
-      }
-      .study-table th, 
-      .study-table td {
-        padding: 10px 6px; /* Reduce padding slightly */
-        font-size: 12px;
-      }
-      .study-check {
-        width: 45px; /* Compress the checkbox columns so the chapter name has room */
-      }
-      .chapter-input {
-        font-size: 12px;
-      }
-      
-      /* 5. Adjust Charts and Stats */
-      .charts-row {
-        grid-template-columns: 1fr;
-      }
-      .stat-row {
-        grid-template-columns: 1fr 1fr; /* 2 stats per row instead of wrapping weirdly */
-      }
+      .header-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .controls { width: 100%; justify-content: space-between; }
+      .pomodoro-widget { bottom: 10px; right: 10px; padding: 10px 15px; }
+      .gamification-bar { flex-wrap: wrap; }
+      .study-dashboard { grid-template-columns: 1fr; }
     }
   </style>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 
 <body>
@@ -177,8 +167,8 @@
 
     <div class="controls">
       <span id="userInfo" class="user-info">Not Logged In</span>
-      <button class="btn btn-accent" id="forceSyncBtn" style="display:none;">☁️ Sync Data</button>
-      <button class="btn btn-google" id="loginBtn">Log in to Sync</button>
+      <button class="btn btn-accent" id="forceSyncBtn" style="display:none;">☁️ Sync</button>
+      <button class="btn btn-google" id="loginBtn">Log in</button>
       <button class="btn" id="logoutBtn" style="display:none;">Log Out</button>
       
       <select id="examTargetSelect" class="btn" onchange="switchExamTrack(this.value)">
@@ -186,22 +176,37 @@
         <option value="NEET">Target: NEET (PCB)</option>
       </select>
 
-      <button class="btn" id="themeToggle">🌓</button>
+      <select id="themeSelect" class="btn" onchange="switchTheme(this.value)">
+        <option value="light">Light Theme</option>
+        <option value="dark">Dark Theme</option>
+        <option value="terminal" id="optTerminal" disabled>Terminal (Lvl 5)</option>
+        <option value="survival" id="optSurvival" disabled>Survival (Lvl 10)</option>
+      </select>
     </div>
+  </div>
+
+  <div class="gamification-bar">
+    <div class="level-badge" id="uiLevelBadge">Lvl 1</div>
+    <div class="xp-bar-wrap"><div class="xp-fill" id="uiXpFill"></div></div>
+    <div class="xp-text"><span id="uiXpVal">0</span> / <span id="uiXpNext">500</span> XP</div>
   </div>
 
   <div class="main-tabs">
     <button class="main-tab active" onclick="setMainTab('Habits')">Habit Tracker</button>
     <button class="main-tab" onclick="setMainTab('ISC Class 11')">ISC Class 11</button>
     <button class="main-tab" onclick="setMainTab('ISC Class 12')">ISC Class 12</button>
-    
     <button class="main-tab exam-jee" onclick="setMainTab('Mains')">JEE Mains</button>
     <button class="main-tab exam-jee" onclick="setMainTab('Advanced')">JEE Advanced</button>
-    
     <button class="main-tab exam-neet" onclick="setMainTab('NEET')" style="display:none;">NEET Tracker</button>
   </div>
 
   <div id="view-Habits" class="view-section active">
+    
+    <div class="focus-widget" id="focusWidget">
+      <h3>🎯 Today's Focus <span class="sub" style="font-weight:normal;" id="focusDate"></span></h3>
+      <div class="focus-list" id="focusList"></div>
+    </div>
+
     <div class="header-row" style="margin-bottom: 10px;">
       <h2 style="font-size:18px;">Monthly Habits</h2>
       <div class="controls">
@@ -214,7 +219,7 @@
     
     <div class="stat-row" id="statsRow">
       <div class="stat"><div class="sub">Total Checks</div><div class="s-val" id="stTotalChecks">0</div></div>
-      <div class="stat"><div class="sub">Active Habits</div><div class="s-val" id="stBestStreak">0</div></div>
+      <div class="stat"><div class="sub">Active Streaks</div><div class="s-val" id="stBestStreak">0</div><div style="position:absolute; top:10px; right:10px; font-size:20px; opacity:0.2;">🔥</div></div>
       <div class="stat"><div class="sub">Avg Completion</div><div class="s-val" id="stAvgComp" style="color:var(--accent2)">0%</div></div>
     </div>
 
@@ -227,7 +232,6 @@
 
     <div class="charts-row">
       <div class="chart-card"><canvas id="lineChart"></canvas></div>
-      <div class="chart-card"><canvas id="barChart" style="display:none;"></canvas></div> 
     </div>
   </div>
 
@@ -261,9 +265,15 @@
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-  <script>
+  <div class="pomodoro-widget">
+    <div class="pomo-time" id="pomoTimeDisplay">25:00</div>
+    <div class="pomo-controls">
+      <button id="pomoPlayBtn" onclick="togglePomodoro()">▶</button>
+      <button onclick="resetPomodoro()">↻</button>
+    </div>
+  </div>
 
+  <script>
   /* =========================================
      1. FIREBASE CONFIGURATION
      ========================================= */
@@ -278,106 +288,147 @@
   };
 
   let auth, db, currentUser = null;
-  try {
-    firebase.initializeApp(firebaseConfig);
-    auth = firebase.auth();
-    db = firebase.firestore();
-  } catch (e) {
-    console.log("Firebase not configured properly.");
-  }
+  try { firebase.initializeApp(firebaseConfig); auth = firebase.auth(); db = firebase.firestore(); } catch (e) {}
 
   /* --- STATE MANAGEMENT --- */
-  let currentMainTab = 'Habits'; 
-  let currentSubTab = 'Physics';
+  let currentMainTab = 'Habits', currentSubTab = 'Physics';
   let currentExamTrack = localStorage.getItem('examTrack') || 'JEE';
-
-  // Default Data Templates
-  const isc11Syllabus = {
-    Physics: ["Physical World and Measurement", "Kinematics", "Laws of Motion", "Work, Energy and Power", "Motion of System of Particles and Rigid Body", "Gravitation", "Properties of Bulk Matter", "Thermodynamics", "Behaviour of Perfect Gases and Kinetic Theory of Gases", "Oscillations and Waves"],
-    Chemistry: ["Some Basic Concepts of Chemistry", "Structure of Atom", "Classification of Elements and Periodicity", "Chemical Bonding and Molecular Structure", "States of Matter: Gases and Liquids", "Chemical Thermodynamics", "Equilibrium", "Redox Reactions", "Hydrogen", "s-Block Elements", "Some p-Block Elements", "Organic Chemistry - Basic Principles and Techniques", "Hydrocarbons", "Environmental Chemistry"],
-    Maths: ["Sets and Functions", "Relations and Functions", "Trigonometry", "Principle of Mathematical Induction", "Complex Numbers and Quadratic Equations", "Linear Inequalities", "Permutations and Combinations", "Binomial Theorem", "Sequence and Series", "Straight Lines", "Conic Sections", "Introduction to 3D Geometry", "Limits and Derivatives", "Mathematical Reasoning", "Statistics", "Probability"],
-    Biology: ["Diversity of Living Organisms", "Structural Organisation in Animals and Plants", "Cell: Structure and Function", "Plant Physiology", "Human Physiology"]
-  };
-
-  const isc12Syllabus = {
-    Physics: ["Electrostatics", "Current Electricity", "Magnetic Effects of Current and Magnetism", "Electromagnetic Induction and Alternating Currents", "Electromagnetic Waves", "Optics", "Dual Nature of Radiation and Matter", "Atoms and Nuclei", "Electronic Devices"],
-    Chemistry: ["Solid State", "Solutions", "Electrochemistry", "Chemical Kinetics", "Surface Chemistry", "General Principles and Processes of Isolation of Elements", "p-Block Elements", "d- and f- Block Elements", "Coordination Compounds", "Haloalkanes and Haloarenes", "Alcohols, Phenols and Ethers", "Aldehydes, Ketones and Carboxylic Acids", "Organic Compounds containing Nitrogen", "Biomolecules", "Polymers", "Chemistry in Everyday Life"],
-    Maths: ["Relations and Functions", "Inverse Trigonometric Functions", "Matrices", "Determinants", "Continuity and Differentiability", "Applications of Derivatives", "Integrals", "Differential Equations", "Probability", "Vectors", "Three-Dimensional Geometry", "Applications of Integrals", "Linear Regression"],
-    Biology: ["Reproduction", "Genetics and Evolution", "Biology and Human Welfare", "Biotechnology and its Applications", "Ecology and Environment"]
-  };
-  
-  const neetSyllabus = {
-    Physics: ["Physical World and Measurement", "Kinematics", "Laws of Motion", "Work, Energy and Power", "Motion of System of Particles and Rigid Body", "Gravitation", "Properties of Bulk Matter", "Thermodynamics", "Behaviour of Perfect Gases and Kinetic Theory of Gases", "Oscillations and Waves", "Electrostatics", "Current Electricity", "Magnetic Effects of Current and Magnetism", "Electromagnetic Induction and Alternating Currents", "Electromagnetic Waves", "Optics", "Dual Nature of Radiation and Matter", "Atoms and Nuclei", "Electronic Devices"],
-    Chemistry: ["Some Basic Concepts of Chemistry", "Structure of Atom", "Classification of Elements and Periodicity", "Chemical Bonding and Molecular Structure", "Thermodynamics", "Equilibrium", "Redox Reactions", "p-Block Elements", "d- and f-Block Elements", "Coordination Compounds", "Organic Chemistry - Basic Principles and Techniques", "Hydrocarbons", "Haloalkanes and Haloarenes", "Alcohols, Phenols and Ethers", "Aldehydes, Ketones and Carboxylic Acids", "Organic Compounds containing Nitrogen", "Biomolecules"],
-    Biology: ["Diversity in Living World", "Structural Organisation in Animals and Plants", "Cell Structure and Function", "Plant Physiology", "Human Physiology", "Reproduction", "Genetics and Evolution", "Biology and Human Welfare", "Biotechnology and Its Applications", "Ecology and Environment"]
-  };
+  let currentTheme = localStorage.getItem('appTheme') || 'light';
 
   const defaultStudyData = {
-    'ISC Class 11': JSON.parse(JSON.stringify(isc11Syllabus)),
-    'ISC Class 12': JSON.parse(JSON.stringify(isc12Syllabus)),
-    Mains: { Physics: ["Units and Measurements", "Kinematics"], Chemistry: ["Some Basic Concepts in Chemistry"], Maths: ["Sets, Relations and Functions"] },
-    Advanced: { Physics: ["Mechanics"], Chemistry: ["Physical Chemistry"], Maths: ["Algebra"] },
-    NEET: JSON.parse(JSON.stringify(neetSyllabus))
+    'ISC Class 11': { Physics: ["Kinematics", "Laws of Motion"], Chemistry: ["Structure of Atom"], Maths: ["Sets and Functions"], Biology: ["Cell Structure"], "Computer Science": ["Java Intro", "Arrays"] },
+    'ISC Class 12': { Physics: ["Electrostatics"], Chemistry: ["Solutions"], Maths: ["Calculus"], Biology: ["Genetics"], "Computer Science": ["Data Structures"] },
+    Mains: { Physics: ["Mechanics"], Chemistry: ["Physical Chemistry"], Maths: ["Algebra"] },
+    Advanced: { Physics: ["Rotational Dynamics"], Chemistry: ["Organic"], Maths: ["Coordinate Geometry"] },
+    NEET: { Physics: ["Kinematics"], Chemistry: ["Thermodynamics"], Biology: ["Human Physiology"] }
   };
 
-  // Load Initial Offline Data
   let habits = JSON.parse(localStorage.getItem('habits')) || ['Morning workout', 'Read 20 pages'];
-  let habitChecks = JSON.parse(localStorage.getItem('habitChecks')) || {};
+  let habitChecks = JSON.parse(localStorage.getItem('habitChecksV4')) || {}; // V4 supports 3 states: true, 'rest', false
   let studyData = JSON.parse(localStorage.getItem('studyDataV3')) || defaultStudyData;
-  let studyChecks = JSON.parse(localStorage.getItem('studyChecksV3')) || {};
-  
-  // Inject missing chapters into older saves to prevent errors
-  if (!studyData.NEET) studyData.NEET = JSON.parse(JSON.stringify(neetSyllabus));
-  if (!studyData['ISC Class 11'].Biology) studyData['ISC Class 11'].Biology = [...isc11Syllabus.Biology];
-  if (!studyData['ISC Class 12'].Biology) studyData['ISC Class 12'].Biology = [...isc12Syllabus.Biology];
-  if (!studyData['ISC Class 12'].Maths) studyData['ISC Class 12'].Maths = [...isc12Syllabus.Maths];
+  let studyChecks = JSON.parse(localStorage.getItem('studyChecksV4')) || {}; // V4 supports Timestamps
+  let userStats = JSON.parse(localStorage.getItem('userStatsV1')) || { xp: 0, level: 1 };
+
+  // Migrations for older saves
+  if(localStorage.getItem('habitChecks')) {
+    let oldH = JSON.parse(localStorage.getItem('habitChecks'));
+    for(let k in oldH) if(oldH[k] === true) habitChecks[k] = true;
+    localStorage.removeItem('habitChecks');
+  }
+  if(localStorage.getItem('studyChecksV3')) {
+    let oldS = JSON.parse(localStorage.getItem('studyChecksV3'));
+    for(let k in oldS) if(oldS[k] === true) studyChecks[k] = Date.now(); // convert to timestamp
+    localStorage.removeItem('studyChecksV3');
+  }
 
   const now = new Date();
   let viewYear = now.getFullYear(), viewMonth = now.getMonth();
 
   /* =========================================
-     2. SYNC LOGIC
+     GAMIFICATION & THEMES
+     ========================================= */
+  function addXP(amount) {
+    userStats.xp += amount;
+    checkLevelUp();
+    saveData();
+    renderUserStats();
+  }
+
+  function checkLevelUp() {
+    const requiredXp = userStats.level * 500;
+    if (userStats.xp >= requiredXp) {
+      userStats.xp -= requiredXp;
+      userStats.level++;
+      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+      alert(`🎉 Level Up! You are now Level ${userStats.level}.`);
+      updateThemeDropdown();
+    }
+  }
+
+  function renderUserStats() {
+    document.getElementById('uiLevelBadge').innerText = `Lvl ${userStats.level}`;
+    document.getElementById('uiXpVal').innerText = userStats.xp;
+    const required = userStats.level * 500;
+    document.getElementById('uiXpNext').innerText = required;
+    document.getElementById('uiXpFill').style.width = `${(userStats.xp / required) * 100}%`;
+  }
+
+  function updateThemeDropdown() {
+    if (userStats.level >= 5) document.getElementById('optTerminal').disabled = false;
+    if (userStats.level >= 10) document.getElementById('optSurvival').disabled = false;
+  }
+
+  function switchTheme(theme) {
+    if ((theme === 'terminal' && userStats.level < 5) || (theme === 'survival' && userStats.level < 10)) return;
+    currentTheme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    document.getElementById('themeSelect').value = theme;
+    localStorage.setItem('appTheme', theme);
+    if(currentMainTab === 'Habits') renderHabits(); else renderStudy();
+  }
+
+  /* =========================================
+     POMODORO TIMER
+     ========================================= */
+  let pomoTime = 25 * 60; // 25 mins
+  let pomoInterval = null;
+  let isPomoRunning = false;
+
+  function formatTime(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
+
+  function togglePomodoro() {
+    const btn = document.getElementById('pomoPlayBtn');
+    if (isPomoRunning) {
+      clearInterval(pomoInterval);
+      btn.innerText = '▶';
+    } else {
+      btn.innerText = '⏸';
+      pomoInterval = setInterval(() => {
+        pomoTime--;
+        document.getElementById('pomoTimeDisplay').innerText = formatTime(pomoTime);
+        if (pomoTime <= 0) {
+          clearInterval(pomoInterval);
+          addXP(100); // Reward for completing a session
+          alert("🍅 Pomodoro Complete! +100 XP");
+          resetPomodoro();
+        }
+      }, 1000);
+    }
+    isPomoRunning = !isPomoRunning;
+  }
+
+  function resetPomodoro() {
+    clearInterval(pomoInterval);
+    isPomoRunning = false;
+    pomoTime = 25 * 60;
+    document.getElementById('pomoTimeDisplay').innerText = formatTime(pomoTime);
+    document.getElementById('pomoPlayBtn').innerText = '▶';
+  }
+
+  /* =========================================
+     SYNC LOGIC
      ========================================= */
   function saveData() {
     localStorage.setItem('habits', JSON.stringify(habits));
-    localStorage.setItem('habitChecks', JSON.stringify(habitChecks));
+    localStorage.setItem('habitChecksV4', JSON.stringify(habitChecks));
     localStorage.setItem('studyDataV3', JSON.stringify(studyData));
-    localStorage.setItem('studyChecksV3', JSON.stringify(studyChecks));
+    localStorage.setItem('studyChecksV4', JSON.stringify(studyChecks));
     localStorage.setItem('examTrack', currentExamTrack);
+    localStorage.setItem('userStatsV1', JSON.stringify(userStats));
 
     if(currentUser && db) {
       db.collection('users').doc(currentUser.uid).set({
-        habits: habits,
-        habitChecks: habitChecks,
-        studyData: studyData,
-        studyChecks: studyChecks,
-        examTrack: currentExamTrack,
+        habits, habitChecks, studyData, studyChecks, examTrack: currentExamTrack, userStats,
         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-      }).catch(error => console.error("Background sync error:", error));
+      }).catch(e => console.error(e));
     }
   }
 
   if(auth) {
-    document.getElementById('forceSyncBtn').onclick = () => {
-      if(currentUser && db) {
-        document.getElementById('forceSyncBtn').innerText = "Syncing...";
-        db.collection('users').doc(currentUser.uid).set({
-          habits: habits,
-          habitChecks: habitChecks,
-          studyData: studyData,
-          studyChecks: studyChecks,
-          examTrack: currentExamTrack,
-          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          document.getElementById('forceSyncBtn').innerText = "☁️ Sync Data";
-          alert("✅ Data successfully synced to: " + currentUser.email);
-        }).catch(error => {
-          document.getElementById('forceSyncBtn').innerText = "☁️ Sync Data";
-          alert("Error syncing data: " + error.message);
-        });
-      }
-    };
-
     auth.onAuthStateChanged(user => {
       if (user) {
         currentUser = user;
@@ -385,34 +436,17 @@
         document.getElementById('logoutBtn').style.display = 'inline-block';
         document.getElementById('forceSyncBtn').style.display = 'inline-block';
         
-        const emailBox = document.getElementById('userInfo');
-        emailBox.style.display = 'inline-block';
-        emailBox.innerText = `Logged in: ${user.email}`;
-
         db.collection('users').doc(user.uid).get().then(doc => {
           if (doc.exists) {
-            const data = doc.data();
-            if(data.habits) habits = data.habits;
-            if(data.habitChecks) habitChecks = data.habitChecks;
-            if(data.studyData) {
-              studyData = data.studyData;
-              if (!studyData.NEET) studyData.NEET = JSON.parse(JSON.stringify(neetSyllabus));
-              if (!studyData['ISC Class 11'].Biology) studyData['ISC Class 11'].Biology = [...isc11Syllabus.Biology];
-              if (!studyData['ISC Class 12'].Biology) studyData['ISC Class 12'].Biology = [...isc12Syllabus.Biology];
-              if (!studyData['ISC Class 12'].Maths) studyData['ISC Class 12'].Maths = [...isc12Syllabus.Maths];
-            }
-            if(data.studyChecks) studyChecks = data.studyChecks;
-            if(data.examTrack) {
-              currentExamTrack = data.examTrack;
-              switchExamTrack(currentExamTrack);
-            }
-            
-            localStorage.setItem('habits', JSON.stringify(habits));
-            localStorage.setItem('habitChecks', JSON.stringify(habitChecks));
-            localStorage.setItem('studyDataV3', JSON.stringify(studyData));
-            localStorage.setItem('studyChecksV3', JSON.stringify(studyChecks));
-            localStorage.setItem('examTrack', currentExamTrack);
-
+            const d = doc.data();
+            if(d.habits) habits = d.habits;
+            if(d.habitChecks) habitChecks = d.habitChecks;
+            if(d.studyData) studyData = d.studyData;
+            if(d.studyChecks) studyChecks = d.studyChecks;
+            if(d.userStats) userStats = d.userStats;
+            if(d.examTrack) { currentExamTrack = d.examTrack; switchExamTrack(currentExamTrack); }
+            saveData();
+            renderUserStats(); updateThemeDropdown();
             if(currentMainTab === 'Habits') renderHabits(); else renderStudy();
           }
         });
@@ -421,28 +455,18 @@
         document.getElementById('loginBtn').style.display = 'inline-block';
         document.getElementById('logoutBtn').style.display = 'none';
         document.getElementById('forceSyncBtn').style.display = 'none';
-        document.getElementById('userInfo').style.display = 'none';
       }
     });
-
-    document.getElementById('loginBtn').onclick = () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(error => alert("Login failed: " + error.message));
-    };
-
-    document.getElementById('logoutBtn').onclick = () => {
-      auth.signOut();
-      alert("Logged out. Changes will now only save to this device.");
-    };
+    
+    document.getElementById('loginBtn').onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    document.getElementById('logoutBtn').onclick = () => auth.signOut();
   }
 
-  /* --- TAB ROUTING & PREFERENCES --- */
+  /* --- TAB ROUTING --- */
   function switchExamTrack(track) {
     currentExamTrack = track;
     document.getElementById('examTargetSelect').value = track;
     saveData();
-    
-    // Toggle Competitive Tabs
     if (track === 'JEE') {
       document.querySelectorAll('.exam-jee').forEach(el => el.style.display = 'inline-block');
       document.querySelectorAll('.exam-neet').forEach(el => el.style.display = 'none');
@@ -452,15 +476,12 @@
       document.querySelectorAll('.exam-neet').forEach(el => el.style.display = 'inline-block');
       if (currentMainTab === 'Mains' || currentMainTab === 'Advanced') setMainTab('NEET');
     }
-    
-    // Refresh to handle Math/Bio visibility
     if (currentMainTab !== 'Habits') renderStudy();
   }
 
   function setMainTab(tab) {
     currentMainTab = tab;
     document.querySelectorAll('.main-tab').forEach(b => b.classList.toggle('active', b.innerText.includes(tab)));
-    
     if (tab === 'Habits') {
       document.getElementById('view-Habits').classList.add('active');
       document.getElementById('view-Study').classList.remove('active');
@@ -474,50 +495,28 @@
 
   function setSubTab(sub) { currentSubTab = sub; renderStudy(); }
 
-  function addSubject() {
-    const sub = prompt(`Add new subject to ${currentMainTab}:`);
-    if(sub && sub.trim() !== '') {
-      studyData[currentMainTab][sub.trim()] = [];
-      currentSubTab = sub.trim();
-      saveData(); renderStudy();
-    }
-  }
-
-  function addChapter() {
-    const ch = prompt(`Add chapter to ${currentMainTab} - ${currentSubTab}:`);
-    if(ch && ch.trim() !== '') {
-      studyData[currentMainTab][currentSubTab].push(ch.trim());
-      saveData(); renderStudy();
-    }
-  }
-
-  function updateChapterName(oldName, newName) {
-    const trimmed = newName.trim();
-    if (!trimmed || trimmed === oldName) return;
-    const idx = studyData[currentMainTab][currentSubTab].indexOf(oldName);
-    if (idx !== -1) {
-      studyData[currentMainTab][currentSubTab][idx] = trimmed;
-      ['Theory','Ex','PYQ','Rev'].forEach(col => {
-        const oldKey = `${currentMainTab}-${currentSubTab}-${oldName}-${col}`;
-        const newKey = `${currentMainTab}-${currentSubTab}-${trimmed}-${col}`;
-        if (studyChecks[oldKey] !== undefined) {
-          studyChecks[newKey] = studyChecks[oldKey];
-          delete studyChecks[oldKey];
-        }
-      });
-      saveData(); renderStudy();
-    }
-  }
-
-  function toggleStudyCheck(chapter, col) {
-    const key = `${currentMainTab}-${currentSubTab}-${chapter}-${col}`;
-    studyChecks[key] = !studyChecks[key];
-    saveData(); renderStudy();
-  }
-
-  /* --- HABIT TRACKER LOGIC --- */
+  /* --- HABIT TRACKER --- */
   function hKey(hIdx, d) { return `${viewYear}-${viewMonth}-${hIdx}-${d}`; }
   function daysInMonth(y, m) { return new Date(y, m+1, 0).getDate(); }
+
+  function renderFocusWidget() {
+    const today = new Date();
+    document.getElementById('focusDate').innerText = today.toLocaleDateString();
+    
+    if (viewMonth === today.getMonth() && viewYear === today.getFullYear()) {
+      const d = today.getDate();
+      let pending = habits.filter((h, i) => !habitChecks[hKey(i, d)]);
+      
+      const list = document.getElementById('focusList');
+      if (pending.length === 0) {
+        list.innerHTML = `<span style="color:var(--accent); font-size:12px;">🎉 All habits complete for today!</span>`;
+      } else {
+        list.innerHTML = pending.map((h, i) => `<div class="focus-item" onclick="document.querySelector('#gridBody tr:nth-child(${habits.indexOf(h)+1}) td:nth-child(${d+1})').click()">○ ${h}</div>`).join('');
+      }
+    } else {
+      document.getElementById('focusList').innerHTML = `<span style="font-size:12px; color:var(--muted)">Viewing different month.</span>`;
+    }
+  }
 
   function renderHabits() {
     const tot = daysInMonth(viewYear, viewMonth);
@@ -526,80 +525,134 @@
     
     const body = document.getElementById('gridBody');
     body.innerHTML = '';
+    
+    let allDoneForMonth = true;
+    let totalPossible = tot * habits.length;
+    let currentlyDone = 0;
+
     habits.forEach((h, i) => {
       const tr = document.createElement('tr');
       let row = `<td class="habit-name"><input value="${h}" onchange="updateHabitName(${i}, this.value)"></td>`;
       let doneCount = 0;
+      
       for(let d=1; d<=tot; d++) {
-        const isDone = habitChecks[hKey(i,d)];
-        if(isDone) doneCount++;
-        row += `<td class="day-cell ${isDone?'done':''}" onclick="toggleHabitCell(${i},${d})"></td>`;
+        const state = habitChecks[hKey(i,d)];
+        let cls = '';
+        if (state === true) { cls = 'done'; doneCount++; currentlyDone++; }
+        else if (state === 'rest') { cls = 'rest'; } // Rest doesn't add to doneCount, but visually differs
+        else { allDoneForMonth = false; }
+        
+        row += `<td class="day-cell ${cls}" onclick="cycleHabitCell(${i},${d})"></td>`;
       }
       row += `<td style="text-align:center; font-weight:700;">${Math.round(doneCount/tot*100) || 0}%</td>`;
       tr.innerHTML = row;
       body.appendChild(tr);
     });
+
     document.getElementById('monthLabel').textContent = `${new Intl.DateTimeFormat('en-US', {month:'short'}).format(new Date(viewYear, viewMonth))} '${String(viewYear).slice(2)}`;
     updateHabitStats();
     renderHabitCharts();
+    renderFocusWidget();
+
+    // Confetti if month is 100% (and we actually have habits)
+    if (allDoneForMonth && totalPossible > 0 && currentlyDone === totalPossible) {
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    }
   }
 
   function updateHabitName(i, val) { habits[i] = val; saveData(); renderHabits(); }
-  function toggleHabitCell(i, d) { const k = hKey(i,d); habitChecks[k] = !habitChecks[k]; saveData(); renderHabits(); }
+  
+  function cycleHabitCell(i, d) { 
+    const k = hKey(i,d); 
+    const current = habitChecks[k];
+    
+    if (!current) { habitChecks[k] = true; addXP(10); } 
+    else if (current === true) { habitChecks[k] = 'rest'; userStats.xp -= 10; } 
+    else { delete habitChecks[k]; }
+    
+    saveData(); renderHabits(); 
+  }
 
   let hLineC;
   function renderHabitCharts() {
     const tot = daysInMonth(viewYear, viewMonth);
-    const dailyData = Array.from({length:tot}, (_,d)=> habits.filter((_,i)=>habitChecks[hKey(i,d+1)]).length);
+    const dailyData = Array.from({length:tot}, (_,d)=> habits.filter((_,i)=>habitChecks[hKey(i,d+1)] === true).length);
     if(hLineC) hLineC.destroy();
+    
+    const rootStyle = getComputedStyle(document.body);
+    const accentColor = rootStyle.getPropertyValue('--accent').trim();
+
     hLineC = new Chart(document.getElementById('lineChart'), {
       type: 'line',
-      data: { labels: Array.from({length:tot},(_,i)=>i+1), datasets: [{ label: 'Daily Completion', data: dailyData, borderColor: '#3d6b4f', backgroundColor: 'rgba(61, 107, 79, 0.1)', fill: true, tension: 0.3 }] },
+      data: { labels: Array.from({length:tot},(_,i)=>i+1), datasets: [{ label: 'Completed Habits', data: dailyData, borderColor: accentColor, backgroundColor: rootStyle.getPropertyValue('--chart-grid'), fill: true, tension: 0.3 }] },
       options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
     });
   }
 
   function updateHabitStats() {
-    let total = 0;
-    for(let k in habitChecks) if(habitChecks[k]) total++;
-    document.getElementById('stTotalChecks').textContent = total;
-    document.getElementById('stBestStreak').textContent = habits.length;
+    let totalChecks = 0, currentStreak = 0;
+    
+    // Count all trues historically
+    for(let k in habitChecks) if(habitChecks[k] === true) totalChecks++;
+    
+    // Calculate basic streak (just counting habits done today for simplicity in this view)
+    const today = new Date();
+    const d = today.getDate();
+    let todayDone = habits.filter((_,i) => habitChecks[`${today.getFullYear()}-${today.getMonth()}-${i}-${d}`] === true).length;
+
+    document.getElementById('stTotalChecks').textContent = totalChecks;
+    document.getElementById('stBestStreak').textContent = todayDone; // Simplified streak
+    
     const totPossible = daysInMonth(viewYear, viewMonth) * habits.length;
     let curMonthDone = 0;
     for(let i=0; i<habits.length; i++){
-        for(let d=1; d<=daysInMonth(viewYear, viewMonth); d++){
-            if(habitChecks[hKey(i,d)]) curMonthDone++;
+        for(let day=1; day<=daysInMonth(viewYear, viewMonth); day++){
+            if(habitChecks[hKey(i,day)] === true) curMonthDone++;
         }
     }
     document.getElementById('stAvgComp').textContent = totPossible ? Math.round((curMonthDone/totPossible)*100) + '%' : '0%';
   }
 
-  /* --- STUDY TRACKER LOGIC --- */
+  /* --- STUDY TRACKER --- */
+  function addChapter() {
+    const ch = prompt(`Add chapter to ${currentMainTab} - ${currentSubTab}:`);
+    if(ch && ch.trim() !== '') {
+      if(!studyData[currentMainTab][currentSubTab]) studyData[currentMainTab][currentSubTab] = [];
+      studyData[currentMainTab][currentSubTab].push(ch.trim());
+      saveData(); renderStudy();
+    }
+  }
+
+  function toggleStudyCheck(chapter, col) {
+    const key = `${currentMainTab}-${currentSubTab}-${chapter}-${col}`;
+    if (studyChecks[key]) {
+      delete studyChecks[key];
+      userStats.xp -= 25; // Remove XP if unchecked
+    } else {
+      studyChecks[key] = Date.now(); // Store timestamp instead of boolean
+      addXP(25);
+    }
+    saveData(); renderStudy();
+  }
+
   let studyPie;
   function renderStudy() {
     let subjects = Object.keys(studyData[currentMainTab] || {});
-    
-    // Filter out Biology/Maths dynamically based on exam track
     if (currentMainTab === 'ISC Class 11' || currentMainTab === 'ISC Class 12') {
-      if (currentExamTrack === 'NEET') {
-        subjects = subjects.filter(sub => sub !== 'Maths');
-      } else {
-        subjects = subjects.filter(sub => sub !== 'Biology');
-      }
+      if (currentExamTrack === 'NEET') subjects = subjects.filter(sub => sub !== 'Maths');
+      else subjects = subjects.filter(sub => sub !== 'Biology');
     }
 
-    if (!subjects.includes(currentSubTab) && subjects.length > 0) {
-      currentSubTab = subjects[0];
-    }
+    if (!subjects.includes(currentSubTab) && subjects.length > 0) currentSubTab = subjects[0];
 
-    const subContainer = document.getElementById('subTabsContainer');
-    subContainer.innerHTML = subjects.map(sub => 
+    document.getElementById('subTabsContainer').innerHTML = subjects.map(sub => 
       `<div class="sub-tab ${sub === currentSubTab ? 'active' : ''}" onclick="setSubTab('${sub}')">${sub}</div>`
-    ).join('') + `<div class="sub-tab" style="background:transparent; border-style:dashed;" onclick="addSubject()">+ Subject</div>`;
+    ).join('');
 
     document.getElementById('chartTitle').textContent = `${currentSubTab} Progress`;
     const chapters = (studyData[currentMainTab] && studyData[currentMainTab][currentSubTab]) ? studyData[currentMainTab][currentSubTab] : [];
     const tbody = document.getElementById('studyTableBody');
+    
     if (chapters.length === 0) {
       tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">No chapters added yet.</div></td></tr>`;
     } else {
@@ -607,35 +660,37 @@
         const escapedCh = ch.replace(/"/g, '&quot;');
         return `
         <tr>
-          <td><input type="text" class="chapter-input" value="${escapedCh}" onchange="updateChapterName('${escapedCh}', this.value)"></td>
-          ${['Theory','Ex','PYQ','Rev'].map(col => `
-            <td class="study-check ${studyChecks[`${currentMainTab}-${currentSubTab}-${ch}-${col}`] ? 'done' : ''}" 
-                onclick="toggleStudyCheck('${escapedCh}', '${col}')"></td>
-          `).join('')}
+          <td><input type="text" class="chapter-input" value="${escapedCh}" readonly></td>
+          ${['Theory','Ex','PYQ','Rev'].map(col => {
+            const key = `${currentMainTab}-${currentSubTab}-${escapedCh}-${col}`;
+            const val = studyChecks[key];
+            let cls = val ? 'done' : '';
+            
+            // Spaced Repetition Alert Logic (If column is 'Rev' and was checked > 14 days ago)
+            if (col === 'Rev' && val) {
+               const daysOld = (Date.now() - val) / (1000 * 60 * 60 * 24);
+               if (daysOld > 14) cls = 'needs-rev';
+            }
+            
+            return `<td class="study-check ${cls}" onclick="toggleStudyCheck('${escapedCh}', '${col}')"></td>`;
+          }).join('')}
         </tr>
       `}).join('');
     }
 
     let totalItems = chapters.length * 4;
     let doneItems = 0;
-    chapters.forEach(ch => {
-      ['Theory','Ex','PYQ','Rev'].forEach(col => {
-        if(studyChecks[`${currentMainTab}-${currentSubTab}-${ch}-${col}`]) doneItems++;
-      });
-    });
+    chapters.forEach(ch => { ['Theory','Ex','PYQ','Rev'].forEach(col => { if(studyChecks[`${currentMainTab}-${currentSubTab}-${ch}-${col}`]) doneItems++; }); });
 
     const percent = totalItems === 0 ? 0 : Math.round((doneItems/totalItems)*100);
     if(studyPie) studyPie.destroy();
     const ctx = document.getElementById('studyPieChart');
+    const borderCol = getComputedStyle(document.body).getPropertyValue('--border');
+    const accCol = getComputedStyle(document.body).getPropertyValue('--accent');
+    
     studyPie = new Chart(ctx, {
       type: 'doughnut',
-      data: {
-        datasets: [{
-          data: [percent, 100-percent],
-          backgroundColor: ['#3d6b4f', getComputedStyle(document.body).getPropertyValue('--border')],
-          borderWidth: 0
-        }]
-      },
+      data: { datasets: [{ data: [percent, 100-percent], backgroundColor: [accCol, borderCol], borderWidth: 0 }] },
       options: { cutout: '75%', plugins: { tooltip: {enabled: false} } },
       plugins: [{
         id: 'textCenter',
@@ -654,20 +709,15 @@
     });
   }
 
-  /* --- EVENT LISTENERS & INIT --- */
-  document.getElementById('themeToggle').onclick = () => {
-    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', theme);
-    if(currentMainTab === 'Habits') { renderHabits(); } else { renderStudy(); }
-  };
+  /* --- INIT --- */
+  renderUserStats();
+  updateThemeDropdown();
+  switchTheme(currentTheme);
+  switchExamTrack(currentExamTrack);
 
-  document.getElementById('addHabit').onclick = () => { habits.push('New Habit'); saveData(); renderHabits(); };
   document.getElementById('prevM').onclick = () => { viewMonth--; if(viewMonth<0){viewMonth=11; viewYear--;} renderHabits(); };
   document.getElementById('nextM').onclick = () => { viewMonth++; if(viewMonth>11){viewMonth=0; viewYear++;} renderHabits(); };
-
-  // Run on Boot
-  switchExamTrack(currentExamTrack);
-  setMainTab('Habits');
+  document.getElementById('addHabit').onclick = () => { habits.push('New Habit'); saveData(); renderHabits(); };
 
   </script>
 </body>
