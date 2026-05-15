@@ -747,6 +747,7 @@
     <div class="controls">
       <span id="userInfo" class="user-info" style="display:inline-block;">Not Logged In</span>
       <button class="btn btn-google" id="loginBtn">Sync with Gmail</button>
+      <button class="btn" id="syncBtn" style="display:none;" onclick="forceCloudSync()">☁️ Sync</button>
       <button class="btn" id="leaderboardBtn" style="display:none;" onclick="openLeaderboard()">🏆 Rank</button>
       <button class="btn" id="accountBtn" style="display:none;" onclick="openAccount()">👤 Account</button>
       <button class="btn" id="logoutBtn" style="display:none;">Log Out</button>
@@ -872,7 +873,6 @@
     </div>
   </div>
 
-  <!-- Account Modal -->
   <div id="accountModal" class="modal-backdrop" style="display:none;">
     <div class="modal-content">
       <h2>Your Account</h2>
@@ -897,7 +897,6 @@
     </div>
   </div>
 
-  <!-- Leaderboard Modal -->
   <div id="leaderboardModal" class="modal-backdrop" style="display:none;">
     <div class="modal-content">
       <h2>🏆 Leaderboard</h2>
@@ -1313,6 +1312,7 @@
         if (user) {
           currentUser = user;
           document.getElementById('loginBtn').style.display = 'none';
+          document.getElementById('syncBtn').style.display = 'inline-block';
           document.getElementById('logoutBtn').style.display = 'inline-block';
           document.getElementById('accountBtn').style.display = 'inline-block';
           document.getElementById('leaderboardBtn').style.display = 'inline-block';
@@ -1349,6 +1349,7 @@
         } else {
           currentUser = null;
           document.getElementById('loginBtn').style.display = 'inline-block';
+          document.getElementById('syncBtn').style.display = 'none';
           document.getElementById('logoutBtn').style.display = 'none';
           document.getElementById('accountBtn').style.display = 'none';
           document.getElementById('leaderboardBtn').style.display = 'none';
@@ -1642,7 +1643,7 @@
       let doneItems = 0;
       chapters.forEach(ch => { 
         const escapedCh = ch.replace(/"/g, '&quot;');
-        ['Theory', 'Ex', 'PYQ', 'Rev'].forEach(col => { if (studyChecks[`${currentMainTab}-${currentSubTab}-${escapedCh}-${col}`]) doneItems++; }); 
+        ['Theory', 'Ex', 'PYQ', 'Rev'].forEach(col => { if (studyChecks[`currentMainTab-currentSubTab-escapedCh-col`]) doneItems++; }); 
       });
 
       const percent = totalItems === 0 ? 0 : Math.round((doneItems / totalItems) * 100);
