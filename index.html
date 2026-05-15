@@ -746,7 +746,7 @@
 
     <div class="controls">
       <span id="userInfo" class="user-info" style="display:inline-block;">Not Logged In</span>
-      <button class="btn btn-google" id="loginBtn">Log in</button>
+      <button class="btn btn-google" id="loginBtn">Sync with Gmail</button>
       <button class="btn" id="leaderboardBtn" style="display:none;" onclick="openLeaderboard()">🏆 Rank</button>
       <button class="btn" id="accountBtn" style="display:none;" onclick="openAccount()">👤 Account</button>
       <button class="btn" id="logoutBtn" style="display:none;">Log Out</button>
@@ -882,7 +882,8 @@
       
       <div style="margin-top:20px; border-top: 1px dashed var(--border); padding-top:15px;">
         <label class="sub">Data Management</label>
-        <div style="display:flex; gap:10px; margin-top:10px;">
+        <div style="display:flex; gap:10px; margin-top:10px; flex-wrap: wrap;">
+          <button class="btn btn-accent" onclick="forceCloudSync()">☁️ Force Cloud Sync</button>
           <button class="btn" onclick="exportData()">💾 Export JSON</button>
           <button class="btn" onclick="document.getElementById('importFile').click()">📂 Import JSON</button>
           <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importData(event)">
@@ -1147,6 +1148,42 @@
         }
       };
       reader.readAsText(file);
+    }
+
+    function forceCloudSync() {
+      if (!currentUser || !db) {
+        alert("You must click 'Sync with Gmail' first!");
+        return;
+      }
+      db.collection('users').doc(currentUser.uid).get().then(doc => {
+        if (doc.exists) {
+          const d = doc.data();
+          if (d.habits) habits = d.habits;
+          if (d.habitChecks) habitChecks = d.habitChecks;
+          if (d.studyData) studyData = d.studyData;
+          if (d.studyChecks) studyChecks = d.studyChecks;
+          if (d.userStats) userStats = d.userStats;
+          if (d.displayName) userDisplayName = d.displayName;
+          if (d.examTrack) { currentExamTrack = d.examTrack; switchExamTrack(currentExamTrack); }
+          
+          localStorage.setItem('habits', JSON.stringify(habits));
+          localStorage.setItem('habitChecksV4', JSON.stringify(habitChecks));
+          localStorage.setItem('studyDataV3', JSON.stringify(studyData));
+          localStorage.setItem('studyChecksV4', JSON.stringify(studyChecks));
+          localStorage.setItem('examTrack', currentExamTrack);
+          localStorage.setItem('userStatsV1', JSON.stringify(userStats));
+          
+          renderUserStats(); updateThemeDropdown();
+          if (currentMainTab === 'Habits') renderHabits(); else renderStudy();
+          alert("✅ Data successfully synced from Gmail Cloud!");
+        } else {
+          saveData();
+          alert("☁️ Local data pushed to Gmail Cloud!");
+        }
+      }).catch(e => {
+        console.error(e);
+        alert("❌ Failed to sync with Cloud. Check console.");
+      });
     }
 
     function openLeaderboard(type = 'all') {
