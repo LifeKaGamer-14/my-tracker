@@ -1,153 +1,732 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23000%22/><text y=%22.9em%22 font-size=%2280%22>🎮</text></svg>">
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23000%22/><text y=%22.9em%22 font-size=%2280%22>🎮</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ultimate Planner: Habits & Studies</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap');
-    
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=DM+Mono:wght@400;500&family=Outfit:wght@400;500;700&display=swap');
+
     :root {
-      --bg: #f8f7f4; --surface: #fff; --border: #e2e0d9; --accent: #3d6b4f;
-      --accent2: #c97d3e; --text: #1a1a18; --muted: #7a7870; --cell: 28px;
-      --chart-grid: rgba(0,0,0,0.05); --danger: #d9534f; --xp-color: #f39c12;
+      --bg: #f8f7f4;
+      --surface: #fff;
+      --border: #e2e0d9;
+      --accent: #3d6b4f;
+      --accent2: #c97d3e;
+      --text: #1a1a18;
+      --muted: #7a7870;
+      --glow-accent: rgba(61, 107, 79, 0.2);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      --cell: 28px;
+      --chart-grid: rgba(0, 0, 0, 0.05);
+      --danger: #d9534f;
+      --xp-color: #f39c12;
     }
 
     [data-theme="dark"] {
-      --bg: #121212; --surface: #1e1e1e; --border: #333; --accent: #82b394;
-      --accent2: #e09d62; --text: #e0e0e0; --muted: #a0a0a0; --danger: #ff6b6b;
-      --chart-grid: rgba(255,255,255,0.1); --xp-color: #f1c40f;
+      --bg: #121212;
+      --surface: #1e1e1e;
+      --border: #333;
+      --accent: #82b394;
+      --accent2: #e09d62;
+      --text: #e0e0e0;
+      --muted: #a0a0a0;
+      --danger: #ff6b6b;
+      --chart-grid: rgba(255, 255, 255, 0.1);
+      --xp-color: #f1c40f;
     }
 
     /* Unlockable Themes */
     [data-theme="terminal"] {
-      --bg: #0a0a0a; --surface: #111; --border: #003300; --accent: #00ff00;
-      --accent2: #00cc00; --text: #00ff00; --muted: #006600; --danger: #ff0000;
-      --chart-grid: rgba(0,255,0,0.1); --xp-color: #00ff00;
+      --bg: #0a0a0a;
+      --surface: #111;
+      --border: #003300;
+      --accent: #00ff00;
+      --accent2: #00cc00;
+      --text: #00ff00;
+      --muted: #006600;
+      --danger: #ff0000;
+      --chart-grid: rgba(0, 255, 0, 0.1);
+      --xp-color: #00ff00;
       font-family: 'DM Mono', monospace;
     }
-    [data-theme="terminal"] * { font-family: 'DM Mono', monospace !important; }
 
-   [data-theme="survival"] {
-      --bg: #0d0000; /* Deep void black */
-      --surface: #1a0505; /* Dark obsidian red */
-      --border: #4a0404; /* Crimson block border */
-      --accent: #ff2a2a; /* Glowing health/lava red */
-      --accent2: #ff7300; /* Fire orange */
-      --text: #ffe6e6; /* Pale red-white for readability */
-      --muted: #8c3333; /* Faded blood red */
-      --danger: #ff0000; /* Pure red */
-      --xp-color: #ff4500; /* Hot lava orange */
+    [data-theme="terminal"] * {
+      font-family: 'DM Mono', monospace !important;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.2s, border-color 0.2s; }
-    body { background: var(--bg); font-family: 'Syne', sans-serif; color: var(--text); padding: 1.5rem; padding-bottom: 80px;}
-    h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px;}
-    .creator-tag { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--accent); font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;}
-    .sub { font-size: 13px; color: var(--muted); font-family: 'DM Mono', monospace; }
-    
-    .header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
-    .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;}
-    
-    .btn { border: 0.5px solid var(--border); border-radius: 6px; padding: 8px 14px; font-size: 13px; background: var(--surface); color: var(--text); cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 500; }
-    .btn:hover { background: var(--bg); }
-    .btn-accent { border: none; background: var(--accent); color: white; }
-    .btn-accent:hover { background: var(--accent); opacity: 0.9; color: white; }
-    .btn-google { background: #4285F4; color: white; border: none; display: flex; align-items: center; gap: 5px;}
-    .user-info { font-size: 12px; font-family: 'DM Mono'; color: var(--accent); display: none; background: rgba(61, 107, 79, 0.1); padding: 6px 12px; border-radius: 20px;}
-    
-    select.btn { appearance: none; -webkit-appearance: none; padding-right: 25px; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%237a7870%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 10px auto; }
-    [data-theme="dark"] select.btn, [data-theme="terminal"] select.btn, [data-theme="survival"] select.btn { background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a0a0a0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); }
+    [data-theme="survival"] {
+      --bg: #0d0000;
+      --surface: #1a0505;
+      --border: #4a0404;
+      --accent: #ff2a2a;
+      --accent2: #ff7300;
+      --text: #ffe6e6;
+      --muted: #8c3333;
+      --danger: #ff0000;
+      --xp-color: #ff4500;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Outfit', sans-serif;
+      color: var(--text);
+      padding: 1.5rem;
+      padding-bottom: 80px;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+      color: var(--accent);
+    }
+
+    .creator-tag {
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sub {
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 0.5px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 13px;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-family: 'Syne', sans-serif;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+      background: var(--surface);
+    }
+
+    .btn-accent {
+      border: none;
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-accent:hover {
+      background: var(--accent);
+      opacity: 0.9;
+      color: white;
+    }
+
+    .btn-google {
+      background: #4285F4;
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .user-info {
+      font-size: 12px;
+      font-family: 'DM Mono';
+      color: var(--accent);
+      display: none;
+      background: rgba(61, 107, 79, 0.1);
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+
+    select.btn {
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 25px;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%237a7870%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px top 50%;
+      background-size: 10px auto;
+    }
+
+    [data-theme="dark"] select.btn,
+    [data-theme="terminal"] select.btn,
+    [data-theme="survival"] select.btn {
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a0a0a0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    }
 
     /* Gamification Top Bar */
-    .gamification-bar { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: var(--surface); padding: 12px 20px; border-radius: 12px; border: 0.5px solid var(--border); }
-    .level-badge { font-weight: bold; color: var(--bg); background: var(--accent); padding: 5px 10px; border-radius: 8px; font-size: 14px; font-family: 'DM Mono'; text-transform: uppercase;}
-    .xp-bar-wrap { flex-grow: 1; height: 10px; background: var(--bg); border-radius: 10px; overflow: hidden; border: 0.5px solid var(--border);}
-    .xp-fill { height: 100%; background: var(--xp-color); width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-    .xp-text { font-family: 'DM Mono'; font-size: 12px; color: var(--muted); min-width: 80px; text-align: right;}
+    .gamification-bar {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      background: var(--surface);
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 0.5px solid var(--border);
+    }
+
+    .level-badge {
+      font-weight: bold;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'DM Mono';
+      text-transform: uppercase;
+    }
+
+    .xp-bar-wrap {
+      flex-grow: 1;
+      height: 10px;
+      background: var(--bg);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 0.5px solid var(--border);
+    }
+
+    .xp-fill {
+      height: 100%;
+      background: var(--xp-color);
+      width: 0%;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .xp-text {
+      font-family: 'DM Mono';
+      font-size: 12px;
+      color: var(--muted);
+      min-width: 80px;
+      text-align: right;
+    }
 
     /* Main Tabs */
-    .main-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
-    .main-tab { background: none; border: none; font-family: 'Syne'; font-size: 16px; font-weight: 600; color: var(--muted); cursor: pointer; padding: 5px 10px; white-space: nowrap; }
-    .main-tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); margin-bottom: -12px; }
+    .main-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 10px;
+      overflow-x: auto;
+    }
 
-    .view-section { display: none; animation: fadeIn 0.3s; }
-    .view-section.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px);} to { opacity: 1; transform: translateY(0);} }
+    .main-tab {
+      background: none;
+      border: none;
+      font-family: 'Syne';
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 5px 10px;
+      white-space: nowrap;
+    }
+
+    .main-tab.active {
+      color: var(--accent);
+      border-bottom: 3px solid var(--accent);
+      margin-bottom: -12px;
+    }
+
+    .view-section {
+      display: none;
+      animation: fadeIn 0.3s;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     /* Today's Focus Widget */
-    .focus-widget { background: rgba(61, 107, 79, 0.05); border: 1px dashed var(--accent); border-radius: 12px; padding: 15px; margin-bottom: 20px; }
-    .focus-widget h3 { font-size: 14px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-    .focus-list { display: flex; gap: 10px; flex-wrap: wrap; }
-    .focus-item { background: var(--surface); border: 0.5px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-family: 'DM Mono'; cursor: pointer; }
-    .focus-item:hover { border-color: var(--accent); color: var(--accent); }
+    .focus-widget {
+      background: rgba(61, 107, 79, 0.05);
+      border: 1px dashed var(--accent);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .focus-widget h3 {
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .focus-list {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .focus-item {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-family: 'DM Mono';
+      cursor: pointer;
+    }
+
+    .focus-item:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
 
     /* Habit Tracker Styles */
-    .tracker-wrap { overflow-x: auto; margin-bottom: 1.5rem; border-radius: 8px; border: 0.5px solid var(--border); }
-    table.grid { border-collapse: collapse; min-width: 100%; background: var(--surface); }
-    table.grid th, table.grid td { border: 0.5px solid var(--border); font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text); }
-    table.grid thead th { background: var(--surface); color: var(--muted); padding: 8px 2px; }
-    table.grid thead th.habit-col { text-align: left; padding: 10px; min-width: 180px; font-family: 'Syne', sans-serif; font-size: 12px; }
-    
-    .habit-name input { border: none; outline: none; background: transparent; font-size: 13px; font-family: 'Syne', sans-serif; color: var(--text); width: 100%; }
-    .day-cell { text-align: center; cursor: pointer; height: var(--cell); min-width: var(--cell); user-select: none; }
-    .day-cell:hover { background: var(--bg); }
-    .day-cell.done { background: var(--accent); opacity: 0.3; position: relative; }
-    .day-cell.done::after { content: '✓'; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: var(--text); font-weight: 700; opacity: 1; }
-    .day-cell.rest { background: var(--bg); position: relative; opacity: 0.7;}
-    .day-cell.rest::after { content: '☕'; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 10px; opacity: 0.5; }
-    
-    .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
-    .stat { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 16px; position: relative; overflow: hidden;}
-    .stat .s-val { font-size: 24px; font-weight: 700; color: var(--accent); }
-    .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
-    .chart-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem; }
+    .tracker-wrap {
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      border-radius: 8px;
+      border: 0.5px solid var(--border);
+    }
+
+    table.grid {
+      border-collapse: collapse;
+      min-width: 100%;
+      background: var(--surface);
+    }
+
+    table.grid th,
+    table.grid td {
+      border: 0.5px solid var(--border);
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      color: var(--text);
+    }
+
+    table.grid thead th {
+      background: var(--surface);
+      color: var(--muted);
+      padding: 8px 2px;
+    }
+
+    table.grid thead th.habit-col {
+      text-align: left;
+      padding: 10px;
+      min-width: 180px;
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+    }
+
+    .habit-name input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 13px;
+      font-family: 'Syne', sans-serif;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .day-cell {
+      text-align: center;
+      cursor: pointer;
+      height: var(--cell);
+      min-width: var(--cell);
+      user-select: none;
+    }
+
+    .day-cell:hover {
+      background: var(--bg);
+    }
+
+    .day-cell.done {
+      background: var(--accent);
+      opacity: 0.3;
+      position: relative;
+    }
+
+    .day-cell.done::after {
+      content: '✓';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--text);
+      font-weight: 700;
+      opacity: 1;
+    }
+
+    .day-cell.rest {
+      background: var(--bg);
+      position: relative;
+      opacity: 0.7;
+    }
+
+    .day-cell.rest::after {
+      content: '☕';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 10px;
+      opacity: 0.5;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-bottom: 2rem;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s ease;
+    }
+
+    .stat:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat .s-val {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .charts-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
 
     /* Study Tracker Styles */
-    .sub-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-    .sub-tab { padding: 6px 14px; border-radius: 20px; background: var(--surface); border: 1px solid var(--border); cursor: pointer; font-size: 13px; font-weight: 500; }
-    .sub-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
-    
-    .study-dashboard { display: grid; grid-template-columns: 250px 1fr; gap: 20px; }
-    .study-chart-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .pie-container { height: 180px; width: 100%; position: relative; display: flex; justify-content: center; margin-top: 15px; }
-    
-    .study-table-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; }
-    .study-table { width: 100%; border-collapse: collapse; }
-    .study-table th, .study-table td { border-bottom: 0.5px solid var(--border); border-right: 0.5px solid var(--border); padding: 12px; font-size: 13px; text-align: left; }
-    .study-table th { background: #fafafa; font-family: 'DM Mono'; font-size: 11px; color: var(--muted); text-transform: uppercase; }
-    [data-theme="dark"] .study-table th { background: #252525; }
-    .study-table td:last-child, .study-table th:last-child { border-right: none; }
-    .study-table tr:last-child td { border-bottom: none; }
-    
-    .chapter-input { border: none; background: transparent; font-family: inherit; font-size: 13px; color: var(--text); width: 100%; outline: none; padding: 4px; margin: -4px; border-radius: 4px; }
-    .chapter-input:focus { color: var(--accent); border-bottom: 1px dashed var(--accent); }
-    
-    .study-check { text-align: center; cursor: pointer; width: 70px; font-weight: bold; position: relative; user-select: none;}
-    .study-check:hover { background: var(--bg); }
-    .study-check.done { background: rgba(61, 107, 79, 0.15); color: var(--accent); }
-    .study-check.done::after { content: '✓'; }
-    .study-check.needs-rev { background: rgba(217, 83, 79, 0.1); color: var(--danger); }
-    .study-check.needs-rev::after { content: '!'; }
-    .study-check.needs-rev::before { content: 'Overdue'; position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: var(--danger); color: white; font-size: 9px; padding: 2px 4px; border-radius: 4px; display: none; font-family: 'DM Mono'; z-index: 10;}
-    .study-check.needs-rev:hover::before { display: block; }
-    
-    .empty-state { padding: 40px; text-align: center; color: var(--muted); font-size: 14px; font-style: italic; }
-    .toolbar { padding: 15px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: flex-end; }
+    .sub-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .sub-tab {
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .sub-tab.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .study-dashboard {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 20px;
+    }
+
+    .study-chart-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pie-container {
+      height: 180px;
+      width: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+    }
+
+    .study-table-wrap {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .study-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .study-table th,
+    .study-table td {
+      border-bottom: 0.5px solid var(--border);
+      border-right: 0.5px solid var(--border);
+      padding: 12px;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .study-table th {
+      background: #fafafa;
+      font-family: 'DM Mono';
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    [data-theme="dark"] .study-table th {
+      background: #252525;
+    }
+
+    .study-table td:last-child,
+    .study-table th:last-child {
+      border-right: none;
+    }
+
+    .study-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .chapter-input {
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text);
+      width: 100%;
+      outline: none;
+      padding: 4px;
+      margin: -4px;
+      border-radius: 4px;
+    }
+
+    .chapter-input:focus {
+      color: var(--accent);
+      border-bottom: 1px dashed var(--accent);
+    }
+
+    .study-check {
+      text-align: center;
+      cursor: pointer;
+      width: 70px;
+      font-weight: bold;
+      position: relative;
+      user-select: none;
+    }
+
+    .study-check:hover {
+      background: var(--bg);
+    }
+
+    .study-check.done {
+      background: rgba(61, 107, 79, 0.15);
+      color: var(--accent);
+    }
+
+    .study-check.done::after {
+      content: '✓';
+    }
+
+    .study-check.needs-rev {
+      background: rgba(217, 83, 79, 0.1);
+      color: var(--danger);
+    }
+
+    .study-check.needs-rev::after {
+      content: '!';
+    }
+
+    .study-check.needs-rev::before {
+      content: 'Overdue';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--danger);
+      color: white;
+      font-size: 9px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      display: none;
+      font-family: 'DM Mono';
+      z-index: 10;
+    }
+
+    .study-check.needs-rev:hover::before {
+      display: block;
+    }
+
+    .empty-state {
+      padding: 40px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    .toolbar {
+      padding: 15px;
+      border-bottom: 0.5px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
 
     /* Pomodoro Timer */
-    .pomodoro-widget { position: fixed; bottom: 20px; right: 20px; background: var(--surface); border: 2px solid var(--accent); border-radius: 16px; padding: 15px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 15px; z-index: 1000; }
-    .pomo-time { font-size: 24px; font-weight: 700; font-family: 'DM Mono'; color: var(--accent); width: 80px; text-align: center;}
-    .pomo-controls button { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text); padding: 5px; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
-    .pomo-controls button:hover { background: var(--bg); }
+    .pomodoro-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 15px 25px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .pomodoro-widget:hover {
+      transform: translateY(-5px);
+    }
+
+    .pomo-time {
+      font-size: 24px;
+      font-weight: 700;
+      font-family: 'DM Mono';
+      color: var(--accent);
+      width: 80px;
+      text-align: center;
+    }
+
+    .pomo-controls button {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--text);
+      padding: 5px;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pomo-controls button:hover {
+      background: var(--bg);
+    }
+
+    /* Modals for Account and Leaderboard */
+    .modal-backdrop {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+      display: flex; align-items: center; justify-content: center; z-index: 2000;
+    }
+    .modal-content {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 25px;
+      width: 90%; max-width: 400px; box-shadow: var(--shadow); color: var(--text);
+    }
+    .modal-content h2 { font-family: 'Syne', sans-serif; margin-bottom: 15px; color: var(--accent); }
+    .leaderboard-item {
+      display: flex; justify-content: space-between; align-items: center; padding: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .leaderboard-item:last-child { border-bottom: none; }
+    .rank-badge {
+      background: var(--accent); color: white; border-radius: 50%;
+      width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: bold; margin-right: 10px;
+    }
 
     @media (max-width: 768px) {
-      .header-row { flex-direction: column; align-items: flex-start; gap: 16px; }
-      .controls { width: 100%; justify-content: space-between; }
-      .pomodoro-widget { bottom: 10px; right: 10px; padding: 10px 15px; }
-      .gamification-bar { flex-wrap: wrap; }
-      .study-dashboard { grid-template-columns: 1fr; }
+      .header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .controls {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .pomodoro-widget {
+        bottom: 10px;
+        right: 10px;
+        padding: 10px 15px;
+      }
+
+      .gamification-bar {
+        flex-wrap: wrap;
+      }
+
+      .study-dashboard {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -166,11 +745,12 @@
     </div>
 
     <div class="controls">
-      <span id="userInfo" class="user-info">Not Logged In</span>
-      <button class="btn btn-accent" id="forceSyncBtn" style="display:none;">☁️ Sync</button>
+      <span id="userInfo" class="user-info" style="display:inline-block;">Not Logged In</span>
       <button class="btn btn-google" id="loginBtn">Log in</button>
+      <button class="btn" id="leaderboardBtn" style="display:none;" onclick="openLeaderboard()">🏆 Rank</button>
+      <button class="btn" id="accountBtn" style="display:none;" onclick="openAccount()">👤 Account</button>
       <button class="btn" id="logoutBtn" style="display:none;">Log Out</button>
-      
+
       <select id="examTargetSelect" class="btn" onchange="switchExamTrack(this.value)">
         <option value="JEE">Target: JEE (PCM)</option>
         <option value="NEET">Target: NEET (PCB)</option>
@@ -187,7 +767,9 @@
 
   <div class="gamification-bar">
     <div class="level-badge" id="uiLevelBadge">Lvl 1</div>
-    <div class="xp-bar-wrap"><div class="xp-fill" id="uiXpFill"></div></div>
+    <div class="xp-bar-wrap">
+      <div class="xp-fill" id="uiXpFill"></div>
+    </div>
     <div class="xp-text"><span id="uiXpVal">0</span> / <span id="uiXpNext">500</span> XP</div>
   </div>
 
@@ -201,7 +783,7 @@
   </div>
 
   <div id="view-Habits" class="view-section active">
-    
+
     <div class="focus-widget" id="focusWidget">
       <h3>🎯 Today's Focus <span class="sub" style="font-weight:normal;" id="focusDate"></span></h3>
       <div class="focus-list" id="focusList"></div>
@@ -216,16 +798,28 @@
         <button class="btn btn-accent" id="addHabit">+ New Habit</button>
       </div>
     </div>
-    
+
     <div class="stat-row" id="statsRow">
-      <div class="stat"><div class="sub">Total Checks</div><div class="s-val" id="stTotalChecks">0</div></div>
-      <div class="stat"><div class="sub">Active Streaks</div><div class="s-val" id="stBestStreak">0</div><div style="position:absolute; top:10px; right:10px; font-size:20px; opacity:0.2;">🔥</div></div>
-      <div class="stat"><div class="sub">Avg Completion</div><div class="s-val" id="stAvgComp" style="color:var(--accent2)">0%</div></div>
+      <div class="stat">
+        <div class="sub">Total Checks</div>
+        <div class="s-val" id="stTotalChecks">0</div>
+      </div>
+      <div class="stat">
+        <div class="sub">Active Streaks</div>
+        <div class="s-val" id="stBestStreak">0</div>
+        <div style="position:absolute; top:10px; right:10px; font-size:20px; opacity:0.2;">🔥</div>
+      </div>
+      <div class="stat">
+        <div class="sub">Avg Completion</div>
+        <div class="s-val" id="stAvgComp" style="color:var(--accent2)">0%</div>
+      </div>
     </div>
 
     <div class="tracker-wrap">
       <table class="grid" id="habitGrid">
-        <thead><tr id="gridHead"></tr></thead>
+        <thead>
+          <tr id="gridHead"></tr>
+        </thead>
         <tbody id="gridBody"></tbody>
       </table>
     </div>
@@ -237,16 +831,19 @@
 
   <div id="view-Study" class="view-section">
     <div class="sub-tabs" id="subTabsContainer"></div>
-    
+
     <div class="study-dashboard">
       <div class="study-chart-card">
         <h3 style="font-size:16px;" id="chartTitle">Subject Progress</h3>
         <div class="sub">Theory, Ex, PYQ, Rev</div>
         <div class="pie-container"><canvas id="studyPieChart"></canvas></div>
       </div>
-      
+
       <div class="study-table-wrap">
         <div class="toolbar">
+          <button class="btn" onclick="syncSyllabus()" id="syncSyllabusBtn"
+            style="display:none; margin-right:auto; border-color:var(--accent); color:var(--accent);">🔄 Auto-fill ISC
+            2026</button>
           <button class="btn btn-accent" onclick="addChapter()">+ Add Chapter</button>
         </div>
         <table class="study-table">
@@ -273,452 +870,624 @@
     </div>
   </div>
 
+  <!-- Account Modal -->
+  <div id="accountModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-content">
+      <h2>Your Account</h2>
+      <div class="sub" style="margin-bottom: 15px;" id="accEmailDisplay">email@example.com</div>
+      <label class="sub">Display Name</label>
+      <input type="text" id="accDisplayName" class="chapter-input" style="border:1px solid var(--border); padding:10px; width:100%; margin-top:5px; border-radius:8px; font-size:14px; background:var(--bg);">
+      
+      <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn" onclick="document.getElementById('accountModal').style.display='none'">Cancel</button>
+        <button class="btn btn-accent" onclick="saveAccount()">Save Name</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaderboard Modal -->
+  <div id="leaderboardModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-content">
+      <h2>🏆 Global Leaderboard</h2>
+      <div id="leaderboardList" style="margin-top:15px; max-height:300px; overflow-y:auto; border:1px solid var(--border); border-radius:12px; background:var(--bg);">
+        <div class="empty-state">Loading...</div>
+      </div>
+      <div style="margin-top:20px; text-align:right;">
+        <button class="btn" onclick="document.getElementById('leaderboardModal').style.display='none'">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-  /* =========================================
-     1. FIREBASE CONFIGURATION
-     ========================================= */
-  const firebaseConfig = {
-    apiKey: "AIzaSyCRY2_VP9x9fbjbe8uSu5g7jI99bDD8-lg",
-    authDomain: "console-and-campus.firebaseapp.com",
-    projectId: "console-and-campus",
-    storageBucket: "console-and-campus.firebasestorage.app",
-    messagingSenderId: "502820469967",
-    appId: "1:502820469967:web:3adf1795a11e65ba348bba",
-    measurementId: "G-JGNP68098P"
-  };
+    /* =========================================
+       1. FIREBASE CONFIGURATION
+       ========================================= */
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRY2_VP9x9fbjbe8uSu5g7jI99bDD8-lg",
+      authDomain: "console-and-campus.firebaseapp.com",
+      projectId: "console-and-campus",
+      storageBucket: "console-and-campus.firebasestorage.app",
+      messagingSenderId: "502820469967",
+      appId: "1:502820469967:web:3adf1795a11e65ba348bba",
+      measurementId: "G-JGNP68098P"
+    };
 
-  let auth, db, currentUser = null;
-  try { firebase.initializeApp(firebaseConfig); auth = firebase.auth(); db = firebase.firestore(); } catch (e) {}
+    let auth, db, currentUser = null;
+    try { firebase.initializeApp(firebaseConfig); auth = firebase.auth(); db = firebase.firestore(); } catch (e) { }
 
-  /* --- STATE MANAGEMENT --- */
-  let currentMainTab = 'Habits', currentSubTab = 'Physics';
-  let currentExamTrack = localStorage.getItem('examTrack') || 'JEE';
-  let currentTheme = localStorage.getItem('appTheme') || 'light';
+    /* --- STATE MANAGEMENT --- */
+    let currentMainTab = 'Habits', currentSubTab = 'Physics';
+    let currentExamTrack = localStorage.getItem('examTrack') || 'JEE';
+    let currentTheme = localStorage.getItem('appTheme') || 'light';
+    let userDisplayName = "Student";
 
-  const defaultStudyData = {
-    'ISC Class 11': { Physics: ["Kinematics", "Laws of Motion"], Chemistry: ["Structure of Atom"], Maths: ["Sets and Functions"], Biology: ["Cell Structure"], "Computer Science": ["Java Intro", "Arrays"] },
-    'ISC Class 12': { Physics: ["Electrostatics"], Chemistry: ["Solutions"], Maths: ["Calculus"], Biology: ["Genetics"], "Computer Science": ["Data Structures"] },
-    Mains: { Physics: ["Mechanics"], Chemistry: ["Physical Chemistry"], Maths: ["Algebra"] },
-    Advanced: { Physics: ["Rotational Dynamics"], Chemistry: ["Organic"], Maths: ["Coordinate Geometry"] },
-    NEET: { Physics: ["Kinematics"], Chemistry: ["Thermodynamics"], Biology: ["Human Physiology"] }
-  };
+    const isc2026Syllabus = {
+      'ISC Class 11': {
+        'Physics': ['Physical World and Measurement', 'Kinematics', 'Laws of Motion', 'Work, Energy and Power', 'Motion of System of Particles and Rigid Body', 'Gravitation', 'Properties of Bulk Matter', 'Thermodynamics', 'Behaviour of Perfect Gases and Kinetic Theory of Gases', 'Oscillations and Waves'],
+        'Chemistry': ['Some Basic Concepts of Chemistry', 'Structure of Atom', 'Classification of Elements and Periodicity', 'Chemical Bonding', 'Thermodynamics', 'Equilibrium', 'Redox Reactions', 'Organic Chemistry: Basic Principles', 'Hydrocarbons'],
+        'Maths': ['Sets and Functions', 'Trigonometry', 'Algebra', 'Coordinate Geometry', 'Calculus', 'Statistics and Probability'],
+        'Biology': ['Diversity of Living Organisms', 'Structural Organisation', 'Cell: Structure and Function', 'Plant Physiology', 'Human Physiology'],
+        'Computer Science': ['Data Representation', 'Propositional Logic and Hardware', 'General OOP Concepts', 'Introduction to Java', 'Objects and Classes', 'Statements and Control Structures', 'Methods / Functions', 'Arrays and Strings', 'Trends in Computing'],
+        'English': ['Language: Composition, Proposal, Grammar', 'Literature: Macbeth', 'Literature: Prism', 'Literature: Rhapsody']
+      },
+      'ISC Class 12': {
+        'Physics': ['Electrostatics', 'Current Electricity', 'Magnetic Effects of Current and Magnetism', 'Electromagnetic Induction and Alternating Currents', 'Electromagnetic Waves', 'Optics', 'Dual Nature of Radiation and Matter', 'Atoms and Nuclei', 'Electronic Devices'],
+        'Chemistry': ['Solutions', 'Electrochemistry', 'Chemical Kinetics', 'd and f Block Elements', 'Coordination Compounds', 'Haloalkanes and Haloarenes', 'Alcohols, Phenols and Ethers', 'Aldehydes, Ketones and Carboxylic Acids', 'Organic Compounds containing Nitrogen', 'Biomolecules'],
+        'Maths': ['Relations and Functions', 'Inverse Trigonometric Functions', 'Matrices', 'Determinants', 'Continuity and Differentiability', 'Applications of Derivatives', 'Integrals', 'Differential Equations', 'Vectors', 'Three-dimensional Geometry', 'Probability'],
+        'Biology': ['Reproduction', 'Genetics and Evolution', 'Biology and Human Welfare', 'Biotechnology and its Applications', 'Ecology and Environment'],
+        'Computer Science': ['Boolean Algebra', 'Computer Hardware', 'Objects and Classes', 'Primitive Values, Types, Casting', 'Statements and Control Structures', 'Methods and Constructors', 'Arrays and Strings', 'Recursion', 'Concept of Inheritance', 'Data Structures (Stacks, Queues)', 'Linked Lists', 'Trees'],
+        'English': ['Language: Composition, Directed Writing', 'Literature: Macbeth', 'Literature: Prism', 'Literature: Rhapsody']
+      }
+    };
 
-  let habits = JSON.parse(localStorage.getItem('habits')) || ['Morning workout', 'Read 20 pages'];
-  let habitChecks = JSON.parse(localStorage.getItem('habitChecksV4')) || {}; // V4 supports 3 states: true, 'rest', false
-  let studyData = JSON.parse(localStorage.getItem('studyDataV3')) || defaultStudyData;
-  let studyChecks = JSON.parse(localStorage.getItem('studyChecksV4')) || {}; // V4 supports Timestamps
-  let userStats = JSON.parse(localStorage.getItem('userStatsV1')) || { xp: 0, level: 1 };
+    const defaultStudyData = {
+      'ISC Class 11': JSON.parse(JSON.stringify(isc2026Syllabus['ISC Class 11'])),
+      'ISC Class 12': JSON.parse(JSON.stringify(isc2026Syllabus['ISC Class 12'])),
+      Mains: { Physics: ["Mechanics"], Chemistry: ["Physical Chemistry"], Maths: ["Algebra"] },
+      Advanced: { Physics: ["Rotational Dynamics"], Chemistry: ["Organic"], Maths: ["Coordinate Geometry"] },
+      NEET: { Physics: ["Kinematics"], Chemistry: ["Thermodynamics"], Biology: ["Human Physiology"] }
+    };
 
-  // Migrations for older saves
-  if(localStorage.getItem('habitChecks')) {
-    let oldH = JSON.parse(localStorage.getItem('habitChecks'));
-    for(let k in oldH) if(oldH[k] === true) habitChecks[k] = true;
-    localStorage.removeItem('habitChecks');
-  }
-  if(localStorage.getItem('studyChecksV3')) {
-    let oldS = JSON.parse(localStorage.getItem('studyChecksV3'));
-    for(let k in oldS) if(oldS[k] === true) studyChecks[k] = Date.now(); // convert to timestamp
-    localStorage.removeItem('studyChecksV3');
-  }
+    let habits = JSON.parse(localStorage.getItem('habits')) || ['Morning workout', 'Read 20 pages'];
+    let habitChecks = JSON.parse(localStorage.getItem('habitChecksV4')) || {}; // V4 supports 3 states: true, 'rest', false
+    let studyData = JSON.parse(localStorage.getItem('studyDataV3')) || defaultStudyData;
+    let studyChecks = JSON.parse(localStorage.getItem('studyChecksV4')) || {}; // V4 supports Timestamps
+    let userStats = JSON.parse(localStorage.getItem('userStatsV1')) || { xp: 0, level: 1 };
 
-  const now = new Date();
-  let viewYear = now.getFullYear(), viewMonth = now.getMonth();
-
-  /* =========================================
-     GAMIFICATION & THEMES
-     ========================================= */
-  function addXP(amount) {
-    userStats.xp += amount;
-    checkLevelUp();
-    saveData();
-    renderUserStats();
-  }
-
-  function checkLevelUp() {
-    const requiredXp = userStats.level * 500;
-    if (userStats.xp >= requiredXp) {
-      userStats.xp -= requiredXp;
-      userStats.level++;
-      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-      alert(`🎉 Level Up! You are now Level ${userStats.level}.`);
-      updateThemeDropdown();
+    // Migrations for older saves
+    if (localStorage.getItem('habitChecks')) {
+      let oldH = JSON.parse(localStorage.getItem('habitChecks'));
+      for (let k in oldH) if (oldH[k] === true) habitChecks[k] = true;
+      localStorage.removeItem('habitChecks');
     }
-  }
-
-  function renderUserStats() {
-    document.getElementById('uiLevelBadge').innerText = `Lvl ${userStats.level}`;
-    document.getElementById('uiXpVal').innerText = userStats.xp;
-    const required = userStats.level * 500;
-    document.getElementById('uiXpNext').innerText = required;
-    document.getElementById('uiXpFill').style.width = `${(userStats.xp / required) * 100}%`;
-  }
-
-  function updateThemeDropdown() {
-    if (userStats.level >= 5) document.getElementById('optTerminal').disabled = false;
-    if (userStats.level >= 10) document.getElementById('optSurvival').disabled = false;
-  }
-
-  function switchTheme(theme) {
-    if ((theme === 'terminal' && userStats.level < 5) || (theme === 'survival' && userStats.level < 10)) return;
-    currentTheme = theme;
-    document.documentElement.setAttribute('data-theme', theme);
-    document.getElementById('themeSelect').value = theme;
-    localStorage.setItem('appTheme', theme);
-    if(currentMainTab === 'Habits') renderHabits(); else renderStudy();
-  }
-
-  /* =========================================
-     POMODORO TIMER
-     ========================================= */
-  let pomoTime = 25 * 60; // 25 mins
-  let pomoInterval = null;
-  let isPomoRunning = false;
-
-  function formatTime(seconds) {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  }
-
-  function togglePomodoro() {
-    const btn = document.getElementById('pomoPlayBtn');
-    if (isPomoRunning) {
-      clearInterval(pomoInterval);
-      btn.innerText = '▶';
-    } else {
-      btn.innerText = '⏸';
-      pomoInterval = setInterval(() => {
-        pomoTime--;
-        document.getElementById('pomoTimeDisplay').innerText = formatTime(pomoTime);
-        if (pomoTime <= 0) {
-          clearInterval(pomoInterval);
-          addXP(100); // Reward for completing a session
-          alert("🍅 Pomodoro Complete! +100 XP");
-          resetPomodoro();
-        }
-      }, 1000);
+    if (localStorage.getItem('studyChecksV3')) {
+      let oldS = JSON.parse(localStorage.getItem('studyChecksV3'));
+      for (let k in oldS) if (oldS[k] === true) studyChecks[k] = Date.now(); // convert to timestamp
+      localStorage.removeItem('studyChecksV3');
     }
-    isPomoRunning = !isPomoRunning;
-  }
 
-  function resetPomodoro() {
-    clearInterval(pomoInterval);
-    isPomoRunning = false;
-    pomoTime = 25 * 60;
-    document.getElementById('pomoTimeDisplay').innerText = formatTime(pomoTime);
-    document.getElementById('pomoPlayBtn').innerText = '▶';
-  }
+    const now = new Date();
+    let viewYear = now.getFullYear(), viewMonth = now.getMonth();
 
-  /* =========================================
-     SYNC LOGIC
-     ========================================= */
-  function saveData() {
-    localStorage.setItem('habits', JSON.stringify(habits));
-    localStorage.setItem('habitChecksV4', JSON.stringify(habitChecks));
-    localStorage.setItem('studyDataV3', JSON.stringify(studyData));
-    localStorage.setItem('studyChecksV4', JSON.stringify(studyChecks));
-    localStorage.setItem('examTrack', currentExamTrack);
-    localStorage.setItem('userStatsV1', JSON.stringify(userStats));
-
-    if(currentUser && db) {
-      db.collection('users').doc(currentUser.uid).set({
-        habits, habitChecks, studyData, studyChecks, examTrack: currentExamTrack, userStats,
-        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-      }).catch(e => console.error(e));
+    /* =========================================
+       GAMIFICATION & THEMES
+       ========================================= */
+    function addXP(amount) {
+      userStats.xp += amount;
+      checkLevelUp();
+      saveData();
+      renderUserStats();
     }
-  }
 
-  if(auth) {
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user;
-        document.getElementById('loginBtn').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'inline-block';
-        document.getElementById('forceSyncBtn').style.display = 'inline-block';
-        
-        db.collection('users').doc(user.uid).get().then(doc => {
-          if (doc.exists) {
-            const d = doc.data();
-            if(d.habits) habits = d.habits;
-            if(d.habitChecks) habitChecks = d.habitChecks;
-            if(d.studyData) studyData = d.studyData;
-            if(d.studyChecks) studyChecks = d.studyChecks;
-            if(d.userStats) userStats = d.userStats;
-            if(d.examTrack) { currentExamTrack = d.examTrack; switchExamTrack(currentExamTrack); }
-            saveData();
-            renderUserStats(); updateThemeDropdown();
-            if(currentMainTab === 'Habits') renderHabits(); else renderStudy();
+    function checkLevelUp() {
+      const requiredXp = userStats.level * 500;
+      if (userStats.xp >= requiredXp) {
+        userStats.xp -= requiredXp;
+        userStats.level++;
+        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+        alert(`🎉 Level Up! You are now Level ${userStats.level}.`);
+        updateThemeDropdown();
+      }
+    }
+
+    function renderUserStats() {
+      document.getElementById('uiLevelBadge').innerText = `Lvl ${userStats.level}`;
+      document.getElementById('uiXpVal').innerText = userStats.xp;
+      const required = userStats.level * 500;
+      document.getElementById('uiXpNext').innerText = required;
+      document.getElementById('uiXpFill').style.width = `${(userStats.xp / required) * 100}%`;
+    }
+
+    function updateThemeDropdown() {
+      if (userStats.level >= 5) document.getElementById('optTerminal').disabled = false;
+      if (userStats.level >= 10) document.getElementById('optSurvival').disabled = false;
+    }
+
+    function switchTheme(theme) {
+      if ((theme === 'terminal' && userStats.level < 5) || (theme === 'survival' && userStats.level < 10)) return;
+      currentTheme = theme;
+      document.documentElement.setAttribute('data-theme', theme);
+      document.getElementById('themeSelect').value = theme;
+      localStorage.setItem('appTheme', theme);
+      if (currentMainTab === 'Habits') renderHabits(); else renderStudy();
+    }
+
+    /* =========================================
+       POMODORO TIMER
+       ========================================= */
+    let pomoTime = 25 * 60; // 25 mins
+    let pomoInterval = null;
+    let isPomoRunning = false;
+
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function togglePomodoro() {
+      const btn = document.getElementById('pomoPlayBtn');
+      if (isPomoRunning) {
+        clearInterval(pomoInterval);
+        btn.innerText = '▶';
+      } else {
+        btn.innerText = '⏸';
+        pomoInterval = setInterval(() => {
+          pomoTime--;
+          document.getElementById('pomoTimeDisplay').innerText = formatTime(pomoTime);
+          if (pomoTime <= 0) {
+            clearInterval(pomoInterval);
+            addXP(100); // Reward for completing a session
+            alert("🍅 Pomodoro Complete! +100 XP");
+            resetPomodoro();
           }
-        });
-      } else {
-        currentUser = null;
-        document.getElementById('loginBtn').style.display = 'inline-block';
-        document.getElementById('logoutBtn').style.display = 'none';
-        document.getElementById('forceSyncBtn').style.display = 'none';
+        }, 1000);
       }
-    });
-    
-    document.getElementById('loginBtn').onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    document.getElementById('logoutBtn').onclick = () => auth.signOut();
-  }
-
-  /* --- TAB ROUTING --- */
-  function switchExamTrack(track) {
-    currentExamTrack = track;
-    document.getElementById('examTargetSelect').value = track;
-    saveData();
-    if (track === 'JEE') {
-      document.querySelectorAll('.exam-jee').forEach(el => el.style.display = 'inline-block');
-      document.querySelectorAll('.exam-neet').forEach(el => el.style.display = 'none');
-      if (currentMainTab === 'NEET') setMainTab('Mains');
-    } else {
-      document.querySelectorAll('.exam-jee').forEach(el => el.style.display = 'none');
-      document.querySelectorAll('.exam-neet').forEach(el => el.style.display = 'inline-block');
-      if (currentMainTab === 'Mains' || currentMainTab === 'Advanced') setMainTab('NEET');
+      isPomoRunning = !isPomoRunning;
     }
-    if (currentMainTab !== 'Habits') renderStudy();
-  }
 
-  function setMainTab(tab) {
-    currentMainTab = tab;
-    document.querySelectorAll('.main-tab').forEach(b => b.classList.toggle('active', b.innerText.includes(tab)));
-    if (tab === 'Habits') {
-      document.getElementById('view-Habits').classList.add('active');
-      document.getElementById('view-Study').classList.remove('active');
-      renderHabits();
-    } else {
-      document.getElementById('view-Habits').classList.remove('active');
-      document.getElementById('view-Study').classList.add('active');
-      renderStudy();
+    function resetPomodoro() {
+      clearInterval(pomoInterval);
+      isPomoRunning = false;
+      pomoTime = 25 * 60;
+      document.getElementById('pomoTimeDisplay').innerText = formatTime(pomoTime);
+      document.getElementById('pomoPlayBtn').innerText = '▶';
     }
-  }
 
-  function setSubTab(sub) { currentSubTab = sub; renderStudy(); }
-
-  /* --- HABIT TRACKER --- */
-  function hKey(hIdx, d) { return `${viewYear}-${viewMonth}-${hIdx}-${d}`; }
-  function daysInMonth(y, m) { return new Date(y, m+1, 0).getDate(); }
-
-  function renderFocusWidget() {
-    const today = new Date();
-    document.getElementById('focusDate').innerText = today.toLocaleDateString();
-    
-    if (viewMonth === today.getMonth() && viewYear === today.getFullYear()) {
-      const d = today.getDate();
-      let pending = habits.filter((h, i) => !habitChecks[hKey(i, d)]);
-      
-      const list = document.getElementById('focusList');
-      if (pending.length === 0) {
-        list.innerHTML = `<span style="color:var(--accent); font-size:12px;">🎉 All habits complete for today!</span>`;
-      } else {
-        list.innerHTML = pending.map((h, i) => `<div class="focus-item" onclick="document.querySelector('#gridBody tr:nth-child(${habits.indexOf(h)+1}) td:nth-child(${d+1})').click()">○ ${h}</div>`).join('');
-      }
-    } else {
-      document.getElementById('focusList').innerHTML = `<span style="font-size:12px; color:var(--muted)">Viewing different month.</span>`;
+    /* =========================================
+       ACCOUNT & LEADERBOARD
+       ========================================= */
+    function openAccount() {
+      document.getElementById('accountModal').style.display = 'flex';
+      document.getElementById('accDisplayName').value = userDisplayName;
     }
-  }
 
-  function renderHabits() {
-    const tot = daysInMonth(viewYear, viewMonth);
-    const head = document.getElementById('gridHead');
-    head.innerHTML = '<th class="habit-col">Habit</th>' + Array.from({length:tot}, (_,i)=>`<th>${i+1}</th>`).join('') + '<th>%</th>';
-    
-    const body = document.getElementById('gridBody');
-    body.innerHTML = '';
-    
-    let allDoneForMonth = true;
-    let totalPossible = tot * habits.length;
-    let currentlyDone = 0;
-
-    habits.forEach((h, i) => {
-      const tr = document.createElement('tr');
-      let row = `<td class="habit-name"><input value="${h}" onchange="updateHabitName(${i}, this.value)"></td>`;
-      let doneCount = 0;
-      
-      for(let d=1; d<=tot; d++) {
-        const state = habitChecks[hKey(i,d)];
-        let cls = '';
-        if (state === true) { cls = 'done'; doneCount++; currentlyDone++; }
-        else if (state === 'rest') { cls = 'rest'; } // Rest doesn't add to doneCount, but visually differs
-        else { allDoneForMonth = false; }
-        
-        row += `<td class="day-cell ${cls}" onclick="cycleHabitCell(${i},${d})"></td>`;
-      }
-      row += `<td style="text-align:center; font-weight:700;">${Math.round(doneCount/tot*100) || 0}%</td>`;
-      tr.innerHTML = row;
-      body.appendChild(tr);
-    });
-
-    document.getElementById('monthLabel').textContent = `${new Intl.DateTimeFormat('en-US', {month:'short'}).format(new Date(viewYear, viewMonth))} '${String(viewYear).slice(2)}`;
-    updateHabitStats();
-    renderHabitCharts();
-    renderFocusWidget();
-
-    // Confetti if month is 100% (and we actually have habits)
-    if (allDoneForMonth && totalPossible > 0 && currentlyDone === totalPossible) {
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-    }
-  }
-
-  function updateHabitName(i, val) { habits[i] = val; saveData(); renderHabits(); }
-  
-  function cycleHabitCell(i, d) { 
-    const k = hKey(i,d); 
-    const current = habitChecks[k];
-    
-    if (!current) { habitChecks[k] = true; addXP(10); } 
-    else if (current === true) { habitChecks[k] = 'rest'; userStats.xp -= 10; } 
-    else { delete habitChecks[k]; }
-    
-    saveData(); renderHabits(); 
-  }
-
-  let hLineC;
-  function renderHabitCharts() {
-    const tot = daysInMonth(viewYear, viewMonth);
-    const dailyData = Array.from({length:tot}, (_,d)=> habits.filter((_,i)=>habitChecks[hKey(i,d+1)] === true).length);
-    if(hLineC) hLineC.destroy();
-    
-    const rootStyle = getComputedStyle(document.body);
-    const accentColor = rootStyle.getPropertyValue('--accent').trim();
-
-    hLineC = new Chart(document.getElementById('lineChart'), {
-      type: 'line',
-      data: { labels: Array.from({length:tot},(_,i)=>i+1), datasets: [{ label: 'Completed Habits', data: dailyData, borderColor: accentColor, backgroundColor: rootStyle.getPropertyValue('--chart-grid'), fill: true, tension: 0.3 }] },
-      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-    });
-  }
-
-  function updateHabitStats() {
-    let totalChecks = 0, currentStreak = 0;
-    
-    // Count all trues historically
-    for(let k in habitChecks) if(habitChecks[k] === true) totalChecks++;
-    
-    // Calculate basic streak (just counting habits done today for simplicity in this view)
-    const today = new Date();
-    const d = today.getDate();
-    let todayDone = habits.filter((_,i) => habitChecks[`${today.getFullYear()}-${today.getMonth()}-${i}-${d}`] === true).length;
-
-    document.getElementById('stTotalChecks').textContent = totalChecks;
-    document.getElementById('stBestStreak').textContent = todayDone; // Simplified streak
-    
-    const totPossible = daysInMonth(viewYear, viewMonth) * habits.length;
-    let curMonthDone = 0;
-    for(let i=0; i<habits.length; i++){
-        for(let day=1; day<=daysInMonth(viewYear, viewMonth); day++){
-            if(habitChecks[hKey(i,day)] === true) curMonthDone++;
+    function saveAccount() {
+      const newName = document.getElementById('accDisplayName').value.trim();
+      if(newName) {
+        userDisplayName = newName;
+        document.getElementById('userInfo').innerText = userDisplayName;
+        if(currentUser && db) {
+          db.collection('users').doc(currentUser.uid).set({ displayName: userDisplayName }, { merge: true });
         }
+        document.getElementById('accountModal').style.display = 'none';
+        alert("Account updated successfully!");
+      }
     }
-    document.getElementById('stAvgComp').textContent = totPossible ? Math.round((curMonthDone/totPossible)*100) + '%' : '0%';
-  }
 
-  /* --- STUDY TRACKER --- */
-  function addChapter() {
-    const ch = prompt(`Add chapter to ${currentMainTab} - ${currentSubTab}:`);
-    if(ch && ch.trim() !== '') {
-      if(!studyData[currentMainTab][currentSubTab]) studyData[currentMainTab][currentSubTab] = [];
-      studyData[currentMainTab][currentSubTab].push(ch.trim());
+    function openLeaderboard() {
+      document.getElementById('leaderboardModal').style.display = 'flex';
+      const list = document.getElementById('leaderboardList');
+      list.innerHTML = `<div class="empty-state">Loading global ranks...</div>`;
+      
+      if(!db) return;
+      
+      db.collection('users').orderBy('userStats.xp', 'desc').limit(20).get().then(snapshot => {
+        if(snapshot.empty) {
+          list.innerHTML = `<div class="empty-state">No users found on leaderboard.</div>`;
+          return;
+        }
+        
+        let html = '';
+        let rank = 1;
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          const name = d.displayName || 'Anonymous Student';
+          const xp = d.userStats ? d.userStats.xp : 0;
+          const lvl = d.userStats ? d.userStats.level : 1;
+          const isMe = currentUser && doc.id === currentUser.uid;
+          
+          html += `
+            <div class="leaderboard-item" style="${isMe ? 'background:rgba(61, 107, 79, 0.1);' : ''}">
+              <div style="display:flex; align-items:center;">
+                <div class="rank-badge">${rank}</div>
+                <div>
+                  <div style="font-weight:600; font-size:14px; color:var(--text);">${name} ${isMe ? '(You)' : ''}</div>
+                  <div class="sub">Level ${lvl}</div>
+                </div>
+              </div>
+              <div style="font-family:'DM Mono'; color:var(--accent); font-weight:bold;">${xp} XP</div>
+            </div>
+          `;
+          rank++;
+        });
+        list.innerHTML = html;
+      }).catch(e => {
+        console.error("Error loading leaderboard:", e);
+        list.innerHTML = `<div class="empty-state">Failed to load leaderboard.</div>`;
+      });
+    }
+
+    /* =========================================
+       SYNC LOGIC
+       ========================================= */
+    function saveData() {
+      localStorage.setItem('habits', JSON.stringify(habits));
+      localStorage.setItem('habitChecksV4', JSON.stringify(habitChecks));
+      localStorage.setItem('studyDataV3', JSON.stringify(studyData));
+      localStorage.setItem('studyChecksV4', JSON.stringify(studyChecks));
+      localStorage.setItem('examTrack', currentExamTrack);
+      localStorage.setItem('userStatsV1', JSON.stringify(userStats));
+
+      if (currentUser && db) {
+        db.collection('users').doc(currentUser.uid).set({
+          habits, habitChecks, studyData, studyChecks, examTrack: currentExamTrack, userStats, displayName: userDisplayName,
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).catch(e => console.error(e));
+      }
+    }
+
+    if (auth) {
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          currentUser = user;
+          document.getElementById('loginBtn').style.display = 'none';
+          document.getElementById('logoutBtn').style.display = 'inline-block';
+          document.getElementById('accountBtn').style.display = 'inline-block';
+          document.getElementById('leaderboardBtn').style.display = 'inline-block';
+          document.getElementById('accEmailDisplay').innerText = user.email || 'No Email';
+
+          db.collection('users').doc(user.uid).get().then(doc => {
+            if (doc.exists) {
+              const d = doc.data();
+              if (d.habits) habits = d.habits;
+              if (d.habitChecks) habitChecks = d.habitChecks;
+              if (d.studyData) studyData = d.studyData;
+              if (d.studyChecks) studyChecks = d.studyChecks;
+              if (d.userStats) userStats = d.userStats;
+              if (d.displayName) {
+                userDisplayName = d.displayName;
+              } else {
+                userDisplayName = user.displayName || 'Student';
+              }
+              document.getElementById('userInfo').innerText = userDisplayName;
+              if (d.examTrack) { currentExamTrack = d.examTrack; switchExamTrack(currentExamTrack); }
+              saveData();
+              renderUserStats(); updateThemeDropdown();
+              if (currentMainTab === 'Habits') renderHabits(); else renderStudy();
+            } else {
+              userDisplayName = user.displayName || 'Student';
+              document.getElementById('userInfo').innerText = userDisplayName;
+              saveData(); // Initializes the doc
+              renderUserStats(); updateThemeDropdown();
+              if (currentMainTab === 'Habits') renderHabits(); else renderStudy();
+            }
+          });
+        } else {
+          currentUser = null;
+          document.getElementById('loginBtn').style.display = 'inline-block';
+          document.getElementById('logoutBtn').style.display = 'none';
+          document.getElementById('accountBtn').style.display = 'none';
+          document.getElementById('leaderboardBtn').style.display = 'none';
+          document.getElementById('userInfo').innerText = "Not Logged In";
+        }
+      });
+
+      document.getElementById('loginBtn').onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+      document.getElementById('logoutBtn').onclick = () => auth.signOut();
+    }
+
+    /* --- TAB ROUTING --- */
+    function switchExamTrack(track) {
+      currentExamTrack = track;
+      document.getElementById('examTargetSelect').value = track;
+      saveData();
+      if (track === 'JEE') {
+        document.querySelectorAll('.exam-jee').forEach(el => el.style.display = 'inline-block');
+        document.querySelectorAll('.exam-neet').forEach(el => el.style.display = 'none');
+        if (currentMainTab === 'NEET') setMainTab('Mains');
+      } else {
+        document.querySelectorAll('.exam-jee').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.exam-neet').forEach(el => el.style.display = 'inline-block');
+        if (currentMainTab === 'Mains' || currentMainTab === 'Advanced') setMainTab('NEET');
+      }
+      if (currentMainTab !== 'Habits') renderStudy();
+    }
+
+    function setMainTab(tab) {
+      currentMainTab = tab;
+      document.querySelectorAll('.main-tab').forEach(b => b.classList.toggle('active', b.innerText.includes(tab)));
+      if (tab === 'Habits') {
+        document.getElementById('view-Habits').classList.add('active');
+        document.getElementById('view-Study').classList.remove('active');
+        renderHabits();
+      } else {
+        document.getElementById('view-Habits').classList.remove('active');
+        document.getElementById('view-Study').classList.add('active');
+        renderStudy();
+      }
+    }
+
+    function setSubTab(sub) { currentSubTab = sub; renderStudy(); }
+
+    /* --- HABIT TRACKER --- */
+    function hKey(hIdx, d) { return `${viewYear}-${viewMonth}-${hIdx}-${d}`; }
+    function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
+
+    function renderFocusWidget() {
+      const today = new Date();
+      document.getElementById('focusDate').innerText = today.toLocaleDateString();
+
+      if (viewMonth === today.getMonth() && viewYear === today.getFullYear()) {
+        const d = today.getDate();
+        let pending = habits.filter((h, i) => !habitChecks[hKey(i, d)]);
+
+        const list = document.getElementById('focusList');
+        if (pending.length === 0) {
+          list.innerHTML = `<span style="color:var(--accent); font-size:12px;">🎉 All habits complete for today!</span>`;
+        } else {
+          list.innerHTML = pending.map((h, i) => `<div class="focus-item" onclick="document.querySelector('#gridBody tr:nth-child(${habits.indexOf(h) + 1}) td:nth-child(${d + 1})').click()">○ ${h}</div>`).join('');
+        }
+      } else {
+        document.getElementById('focusList').innerHTML = `<span style="font-size:12px; color:var(--muted)">Viewing different month.</span>`;
+      }
+    }
+
+    function renderHabits() {
+      const tot = daysInMonth(viewYear, viewMonth);
+      const head = document.getElementById('gridHead');
+      head.innerHTML = '<th class="habit-col">Habit</th>' + Array.from({ length: tot }, (_, i) => `<th>${i + 1}</th>`).join('') + '<th>%</th>';
+
+      const body = document.getElementById('gridBody');
+      body.innerHTML = '';
+
+      let allDoneForMonth = true;
+      let totalPossible = tot * habits.length;
+      let currentlyDone = 0;
+
+      habits.forEach((h, i) => {
+        const tr = document.createElement('tr');
+        let row = `<td class="habit-name"><input value="${h}" onchange="updateHabitName(${i}, this.value)"></td>`;
+        let doneCount = 0;
+
+        for (let d = 1; d <= tot; d++) {
+          const state = habitChecks[hKey(i, d)];
+          let cls = '';
+          if (state === true) { cls = 'done'; doneCount++; currentlyDone++; }
+          else if (state === 'rest') { cls = 'rest'; } // Rest doesn't add to doneCount, but visually differs
+          else { allDoneForMonth = false; }
+
+          row += `<td class="day-cell ${cls}" onclick="cycleHabitCell(${i},${d})"></td>`;
+        }
+        row += `<td style="text-align:center; font-weight:700;">${Math.round(doneCount / tot * 100) || 0}%</td>`;
+        tr.innerHTML = row;
+        body.appendChild(tr);
+      });
+
+      document.getElementById('monthLabel').textContent = `${new Intl.DateTimeFormat('en-US', { month: 'short' }).format(new Date(viewYear, viewMonth))} '${String(viewYear).slice(2)}`;
+      updateHabitStats();
+      renderHabitCharts();
+      renderFocusWidget();
+
+      // Confetti if month is 100% (and we actually have habits)
+      if (allDoneForMonth && totalPossible > 0 && currentlyDone === totalPossible) {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      }
+    }
+
+    function updateHabitName(i, val) { habits[i] = val; saveData(); renderHabits(); }
+
+    function cycleHabitCell(i, d) {
+      const k = hKey(i, d);
+      const current = habitChecks[k];
+
+      if (!current) { habitChecks[k] = true; addXP(10); }
+      else if (current === true) { habitChecks[k] = 'rest'; userStats.xp -= 10; }
+      else { delete habitChecks[k]; }
+
+      saveData(); renderHabits();
+    }
+
+    let hLineC;
+    function renderHabitCharts() {
+      const tot = daysInMonth(viewYear, viewMonth);
+      const dailyData = Array.from({ length: tot }, (_, d) => habits.filter((_, i) => habitChecks[hKey(i, d + 1)] === true).length);
+      if (hLineC) hLineC.destroy();
+
+      const rootStyle = getComputedStyle(document.body);
+      const accentColor = rootStyle.getPropertyValue('--accent').trim();
+
+      hLineC = new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: { labels: Array.from({ length: tot }, (_, i) => i + 1), datasets: [{ label: 'Completed Habits', data: dailyData, borderColor: accentColor, backgroundColor: rootStyle.getPropertyValue('--chart-grid'), fill: true, tension: 0.3 }] },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+      });
+    }
+
+    function updateHabitStats() {
+      let totalChecks = 0, currentStreak = 0;
+
+      // Count all trues historically
+      for (let k in habitChecks) if (habitChecks[k] === true) totalChecks++;
+
+      // Calculate basic streak (just counting habits done today for simplicity in this view)
+      const today = new Date();
+      const d = today.getDate();
+      let todayDone = habits.filter((_, i) => habitChecks[`${today.getFullYear()}-${today.getMonth()}-${i}-${d}`] === true).length;
+
+      document.getElementById('stTotalChecks').textContent = totalChecks;
+      document.getElementById('stBestStreak').textContent = todayDone; // Simplified streak
+
+      const totPossible = daysInMonth(viewYear, viewMonth) * habits.length;
+      let curMonthDone = 0;
+      for (let i = 0; i < habits.length; i++) {
+        for (let day = 1; day <= daysInMonth(viewYear, viewMonth); day++) {
+          if (habitChecks[hKey(i, day)] === true) curMonthDone++;
+        }
+      }
+      document.getElementById('stAvgComp').textContent = totPossible ? Math.round((curMonthDone / totPossible) * 100) + '%' : '0%';
+    }
+
+    /* --- STUDY TRACKER --- */
+    function addSubject() {
+      const sub = prompt(`Add subject to ${currentMainTab}:`);
+      if (sub && sub.trim() !== '') {
+        const subjectName = sub.trim();
+        if (!studyData[currentMainTab]) studyData[currentMainTab] = {};
+
+        if (!studyData[currentMainTab][subjectName]) {
+          if (isc2026Syllabus[currentMainTab] && isc2026Syllabus[currentMainTab][subjectName]) {
+            studyData[currentMainTab][subjectName] = [...isc2026Syllabus[currentMainTab][subjectName]];
+            alert(`Auto-loaded ISC 2026 Syllabus for ${subjectName}!`);
+          } else {
+            studyData[currentMainTab][subjectName] = [];
+          }
+        }
+        setSubTab(subjectName);
+        saveData();
+      }
+    }
+
+    function syncSyllabus() {
+      if (confirm(`This will append the latest ISC 2026 syllabus for ${currentSubTab}. Proceed?`)) {
+        const standard = isc2026Syllabus[currentMainTab][currentSubTab];
+        const existing = studyData[currentMainTab][currentSubTab] || [];
+        const newChapters = standard.filter(ch => !existing.includes(ch));
+
+        if (newChapters.length > 0) {
+          studyData[currentMainTab][currentSubTab] = [...existing, ...newChapters];
+          saveData();
+          renderStudy();
+          alert(`Added ${newChapters.length} missing chapters!`);
+        } else {
+          alert("Syllabus is already up to date!");
+        }
+      }
+    }
+
+    function addChapter() {
+      const ch = prompt(`Add chapter to ${currentMainTab} - ${currentSubTab}:`);
+      if (ch && ch.trim() !== '') {
+        if (!studyData[currentMainTab][currentSubTab]) studyData[currentMainTab][currentSubTab] = [];
+        studyData[currentMainTab][currentSubTab].push(ch.trim());
+        saveData(); renderStudy();
+      }
+    }
+
+    function toggleStudyCheck(chapter, col) {
+      const key = `${currentMainTab}-${currentSubTab}-${chapter}-${col}`;
+      if (studyChecks[key]) {
+        delete studyChecks[key];
+        userStats.xp -= 25; // Remove XP if unchecked
+      } else {
+        studyChecks[key] = Date.now(); // Store timestamp instead of boolean
+        addXP(25);
+      }
       saveData(); renderStudy();
     }
-  }
 
-  function toggleStudyCheck(chapter, col) {
-    const key = `${currentMainTab}-${currentSubTab}-${chapter}-${col}`;
-    if (studyChecks[key]) {
-      delete studyChecks[key];
-      userStats.xp -= 25; // Remove XP if unchecked
-    } else {
-      studyChecks[key] = Date.now(); // Store timestamp instead of boolean
-      addXP(25);
-    }
-    saveData(); renderStudy();
-  }
+    let studyPie;
+    function renderStudy() {
+      let subjects = Object.keys(studyData[currentMainTab] || {});
+      if (currentMainTab === 'ISC Class 11' || currentMainTab === 'ISC Class 12') {
+        if (currentExamTrack === 'NEET') subjects = subjects.filter(sub => sub !== 'Maths');
+        else subjects = subjects.filter(sub => sub !== 'Biology');
+      }
 
-  let studyPie;
-  function renderStudy() {
-    let subjects = Object.keys(studyData[currentMainTab] || {});
-    if (currentMainTab === 'ISC Class 11' || currentMainTab === 'ISC Class 12') {
-      if (currentExamTrack === 'NEET') subjects = subjects.filter(sub => sub !== 'Maths');
-      else subjects = subjects.filter(sub => sub !== 'Biology');
-    }
+      if (!subjects.includes(currentSubTab) && subjects.length > 0) currentSubTab = subjects[0];
 
-    if (!subjects.includes(currentSubTab) && subjects.length > 0) currentSubTab = subjects[0];
+      document.getElementById('subTabsContainer').innerHTML = subjects.map(sub =>
+        `<div class="sub-tab ${sub === currentSubTab ? 'active' : ''}" onclick="setSubTab('${sub}')">${sub}</div>`
+      ).join('') + `<div class="sub-tab" style="border-style: dashed; opacity: 0.8;" onclick="addSubject()">+ Subject</div>`;
 
-    document.getElementById('subTabsContainer').innerHTML = subjects.map(sub => 
-      `<div class="sub-tab ${sub === currentSubTab ? 'active' : ''}" onclick="setSubTab('${sub}')">${sub}</div>`
-    ).join('');
+      let syncBtn = document.getElementById('syncSyllabusBtn');
+      if (syncBtn) {
+        if (isc2026Syllabus[currentMainTab] && isc2026Syllabus[currentMainTab][currentSubTab]) {
+          syncBtn.style.display = 'inline-block';
+        } else {
+          syncBtn.style.display = 'none';
+        }
+      }
 
-    document.getElementById('chartTitle').textContent = `${currentSubTab} Progress`;
-    const chapters = (studyData[currentMainTab] && studyData[currentMainTab][currentSubTab]) ? studyData[currentMainTab][currentSubTab] : [];
-    const tbody = document.getElementById('studyTableBody');
-    
-    if (chapters.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">No chapters added yet.</div></td></tr>`;
-    } else {
-      tbody.innerHTML = chapters.map(ch => {
-        const escapedCh = ch.replace(/"/g, '&quot;');
-        return `
+      document.getElementById('chartTitle').textContent = `${currentSubTab} Progress`;
+      const chapters = (studyData[currentMainTab] && studyData[currentMainTab][currentSubTab]) ? studyData[currentMainTab][currentSubTab] : [];
+      const tbody = document.getElementById('studyTableBody');
+
+      if (chapters.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">No chapters added yet.</div></td></tr>`;
+      } else {
+        tbody.innerHTML = chapters.map(ch => {
+          const escapedCh = ch.replace(/"/g, '&quot;');
+          return `
         <tr>
           <td><input type="text" class="chapter-input" value="${escapedCh}" readonly></td>
-          ${['Theory','Ex','PYQ','Rev'].map(col => {
+          ${['Theory', 'Ex', 'PYQ', 'Rev'].map(col => {
             const key = `${currentMainTab}-${currentSubTab}-${escapedCh}-${col}`;
             const val = studyChecks[key];
             let cls = val ? 'done' : '';
-            
+
             // Spaced Repetition Alert Logic (If column is 'Rev' and was checked > 14 days ago)
             if (col === 'Rev' && val) {
-               const daysOld = (Date.now() - val) / (1000 * 60 * 60 * 24);
-               if (daysOld > 14) cls = 'needs-rev';
+              const daysOld = (Date.now() - val) / (1000 * 60 * 60 * 24);
+              if (daysOld > 14) cls = 'needs-rev';
             }
-            
+
             return `<td class="study-check ${cls}" onclick="toggleStudyCheck('${escapedCh}', '${col}')"></td>`;
           }).join('')}
         </tr>
       `}).join('');
+      }
+
+      let totalItems = chapters.length * 4;
+      let doneItems = 0;
+      chapters.forEach(ch => { ['Theory', 'Ex', 'PYQ', 'Rev'].forEach(col => { if (studyChecks[`${currentMainTab}-${currentSubTab}-${ch}-${col}`]) doneItems++; }); });
+
+      const percent = totalItems === 0 ? 0 : Math.round((doneItems / totalItems) * 100);
+      if (studyPie) studyPie.destroy();
+      const ctx = document.getElementById('studyPieChart');
+      const borderCol = getComputedStyle(document.body).getPropertyValue('--border');
+      const accCol = getComputedStyle(document.body).getPropertyValue('--accent');
+
+      studyPie = new Chart(ctx, {
+        type: 'doughnut',
+        data: { datasets: [{ data: [percent, 100 - percent], backgroundColor: [accCol, borderCol], borderWidth: 0 }] },
+        options: { cutout: '75%', plugins: { tooltip: { enabled: false } } },
+        plugins: [{
+          id: 'textCenter',
+          beforeDraw: function (chart) {
+            var width = chart.width, height = chart.height, ctx = chart.ctx;
+            ctx.restore();
+            var fontSize = (height / 114).toFixed(2);
+            ctx.font = "bold " + fontSize + "em Syne";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text');
+            var text = percent + "%", textX = Math.round((width - ctx.measureText(text).width) / 2), textY = height / 2;
+            ctx.fillText(text, textX, textY);
+            ctx.save();
+          }
+        }]
+      });
     }
 
-    let totalItems = chapters.length * 4;
-    let doneItems = 0;
-    chapters.forEach(ch => { ['Theory','Ex','PYQ','Rev'].forEach(col => { if(studyChecks[`${currentMainTab}-${currentSubTab}-${ch}-${col}`]) doneItems++; }); });
+    /* --- INIT --- */
+    renderUserStats();
+    updateThemeDropdown();
+    switchTheme(currentTheme);
+    switchExamTrack(currentExamTrack);
 
-    const percent = totalItems === 0 ? 0 : Math.round((doneItems/totalItems)*100);
-    if(studyPie) studyPie.destroy();
-    const ctx = document.getElementById('studyPieChart');
-    const borderCol = getComputedStyle(document.body).getPropertyValue('--border');
-    const accCol = getComputedStyle(document.body).getPropertyValue('--accent');
-    
-    studyPie = new Chart(ctx, {
-      type: 'doughnut',
-      data: { datasets: [{ data: [percent, 100-percent], backgroundColor: [accCol, borderCol], borderWidth: 0 }] },
-      options: { cutout: '75%', plugins: { tooltip: {enabled: false} } },
-      plugins: [{
-        id: 'textCenter',
-        beforeDraw: function(chart) {
-          var width = chart.width, height = chart.height, ctx = chart.ctx;
-          ctx.restore();
-          var fontSize = (height / 114).toFixed(2);
-          ctx.font = "bold " + fontSize + "em Syne";
-          ctx.textBaseline = "middle";
-          ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text');
-          var text = percent + "%", textX = Math.round((width - ctx.measureText(text).width) / 2), textY = height / 2;
-          ctx.fillText(text, textX, textY);
-          ctx.save();
-        }
-      }]
-    });
-  }
-
-  /* --- INIT --- */
-  renderUserStats();
-  updateThemeDropdown();
-  switchTheme(currentTheme);
-  switchExamTrack(currentExamTrack);
-
-  document.getElementById('prevM').onclick = () => { viewMonth--; if(viewMonth<0){viewMonth=11; viewYear--;} renderHabits(); };
-  document.getElementById('nextM').onclick = () => { viewMonth++; if(viewMonth>11){viewMonth=0; viewYear++;} renderHabits(); };
-  document.getElementById('addHabit').onclick = () => { habits.push('New Habit'); saveData(); renderHabits(); };
-
+    document.getElementById('prevM').onclick = () => { viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; } renderHabits(); };
+    document.getElementById('nextM').onclick = () => { viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; } renderHabits(); };
+    document.getElementById('addHabit').onclick = () => { habits.push('New Habit'); saveData(); renderHabits(); };
   </script>
 </body>
 </html>
