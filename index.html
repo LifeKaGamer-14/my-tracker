@@ -767,6 +767,7 @@
 
   <div class="gamification-bar">
     <div class="level-badge" id="uiLevelBadge">Lvl 1</div>
+    <div class="level-badge" id="uiRankBadge" style="background:var(--accent2); display:none;">Rank #--</div>
     <div class="xp-bar-wrap">
       <div class="xp-fill" id="uiXpFill"></div>
     </div>
@@ -888,8 +889,13 @@
   <!-- Leaderboard Modal -->
   <div id="leaderboardModal" class="modal-backdrop" style="display:none;">
     <div class="modal-content">
-      <h2>🏆 Global Leaderboard</h2>
-      <div id="leaderboardList" style="margin-top:15px; max-height:300px; overflow-y:auto; border:1px solid var(--border); border-radius:12px; background:var(--bg);">
+      <h2>🏆 Leaderboard</h2>
+      <div class="sub-tabs" style="margin-bottom: 10px;">
+        <div class="sub-tab active" id="tabLbAll" onclick="openLeaderboard('all')">All-Time</div>
+        <div class="sub-tab" id="tabLbMonth" onclick="openLeaderboard('monthly')">Monthly</div>
+        <div class="sub-tab" id="tabLbWeek" onclick="openLeaderboard('weekly')">Weekly</div>
+      </div>
+      <div id="leaderboardList" style="margin-top:10px; max-height:300px; overflow-y:auto; border:1px solid var(--border); border-radius:12px; background:var(--bg);">
         <div class="empty-state">Loading...</div>
       </div>
       <div style="margin-top:20px; text-align:right;">
@@ -952,7 +958,20 @@
     let habitChecks = JSON.parse(localStorage.getItem('habitChecksV4')) || {}; // V4 supports 3 states: true, 'rest', false
     let studyData = JSON.parse(localStorage.getItem('studyDataV3')) || defaultStudyData;
     let studyChecks = JSON.parse(localStorage.getItem('studyChecksV4')) || {}; // V4 supports Timestamps
-    let userStats = JSON.parse(localStorage.getItem('userStatsV1')) || { xp: 0, level: 1 };
+    
+    function getWeekId() {
+      const d = new Date();
+      d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+      const weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+      return `${d.getUTCFullYear()}-W${weekNo}`;
+    }
+    function getMonthId() {
+      const d = new Date();
+      return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2, '0')}`;
+    }
+
+    let userStats = JSON.parse(localStorage.getItem('userStatsV1')) || { xp: 0, level: 1, weeklyXp: 0, monthlyXp: 0, weekId: getWeekId(), monthId: getMonthId() };
 
     // Migrations for older saves
     if (localStorage.getItem('habitChecks')) {
@@ -973,7 +992,16 @@
        GAMIFICATION & THEMES
        ========================================= */
     function addXP(amount) {
+      const currentWeek = getWeekId();
+      const currentMonth = getMonthId();
+      
+      if(userStats.weekId !== currentWeek) { userStats.weeklyXp = 0; userStats.weekId = currentWeek; }
+      if(userStats.monthId !== currentMonth) { userStats.monthlyXp = 0; userStats.monthId = currentMonth; }
+      
       userStats.xp += amount;
+      userStats.weeklyXp = (userStats.weeklyXp || 0) + amount;
+      userStats.monthlyXp = (userStats.monthlyXp || 0) + amount;
+      
       checkLevelUp();
       saveData();
       renderUserStats();
@@ -1075,14 +1103,22 @@
       }
     }
 
-    function openLeaderboard() {
+    function openLeaderboard(type = 'all') {
       document.getElementById('leaderboardModal').style.display = 'flex';
       const list = document.getElementById('leaderboardList');
-      list.innerHTML = `<div class="empty-state">Loading global ranks...</div>`;
+      list.innerHTML = `<div class="empty-state">Loading ranks...</div>`;
+      
+      document.getElementById('tabLbAll').classList.toggle('active', type === 'all');
+      document.getElementById('tabLbMonth').classList.toggle('active', type === 'monthly');
+      document.getElementById('tabLbWeek').classList.toggle('active', type === 'weekly');
       
       if(!db) return;
       
-      db.collection('users').orderBy('userStats.xp', 'desc').limit(20).get().then(snapshot => {
+      let orderByField = 'userStats.xp';
+      if (type === 'weekly') orderByField = 'userStats.weeklyXp';
+      if (type === 'monthly') orderByField = 'userStats.monthlyXp';
+      
+      db.collection('users').orderBy(orderByField, 'desc').limit(50).get().then(snapshot => {
         if(snapshot.empty) {
           list.innerHTML = `<div class="empty-state">No users found on leaderboard.</div>`;
           return;
@@ -1090,32 +1126,84 @@
         
         let html = '';
         let rank = 1;
+        let myRank = null;
+        let items = [];
+        
         snapshot.forEach(doc => {
           const d = doc.data();
-          const name = d.displayName || 'Anonymous Student';
-          const xp = d.userStats ? d.userStats.xp : 0;
-          const lvl = d.userStats ? d.userStats.level : 1;
-          const isMe = currentUser && doc.id === currentUser.uid;
+          let xpToShow = d.userStats ? d.userStats.xp : 0;
+          if(type === 'weekly') xpToShow = d.userStats ? (d.userStats.weeklyXp || 0) : 0;
+          if(type === 'monthly') xpToShow = d.userStats ? (d.userStats.monthlyXp || 0) : 0;
           
-          html += `
-            <div class="leaderboard-item" style="${isMe ? 'background:rgba(61, 107, 79, 0.1);' : ''}">
+          items.push({ id: doc.id, data: d, rank: rank, xpToShow: xpToShow });
+          if(currentUser && doc.id === currentUser.uid) myRank = rank;
+          rank++;
+        });
+        
+        const renderRow = (item, isPinned = false) => {
+          const d = item.data;
+          const name = d.displayName || 'Anonymous Student';
+          const lvl = d.userStats ? d.userStats.level : 1;
+          const isMe = currentUser && item.id === currentUser.uid;
+          
+          let badgeStyle = 'background: var(--accent); color: white;';
+          if(item.rank === 1) badgeStyle = 'background: #FFD700; color: #000; box-shadow: 0 0 10px rgba(255,215,0,0.5);';
+          if(item.rank === 2) badgeStyle = 'background: #C0C0C0; color: #000;';
+          if(item.rank === 3) badgeStyle = 'background: #CD7F32; color: #fff;';
+          
+          return `
+            <div class="leaderboard-item" style="${isMe ? 'background:rgba(61, 107, 79, 0.15);' : ''} ${isPinned ? 'border-bottom: 2px solid var(--accent); position:sticky; top:0; background:var(--surface); z-index:10;' : ''}">
               <div style="display:flex; align-items:center;">
-                <div class="rank-badge">${rank}</div>
+                <div class="rank-badge" style="${badgeStyle}">${item.rank}</div>
                 <div>
                   <div style="font-weight:600; font-size:14px; color:var(--text);">${name} ${isMe ? '(You)' : ''}</div>
                   <div class="sub">Level ${lvl}</div>
                 </div>
               </div>
-              <div style="font-family:'DM Mono'; color:var(--accent); font-weight:bold;">${xp} XP</div>
+              <div style="font-family:'DM Mono'; color:var(--accent); font-weight:bold;">${item.xpToShow} XP</div>
             </div>
           `;
-          rank++;
+        };
+
+        if(myRank !== null) html += renderRow(items.find(i => i.id === currentUser.uid), true);
+        items.forEach(item => {
+            if(myRank !== null && item.id === currentUser.uid) return;
+            html += renderRow(item);
         });
+        
         list.innerHTML = html;
+        
+        if (myRank !== null && type === 'all') {
+          const badge = document.getElementById('uiRankBadge');
+          badge.innerText = `Rank #${myRank}`;
+          badge.style.display = 'inline-block';
+        }
       }).catch(e => {
         console.error("Error loading leaderboard:", e);
         list.innerHTML = `<div class="empty-state">Failed to load leaderboard.</div>`;
       });
+    }
+
+    function fetchGlobalRank() {
+        if(!currentUser || !db) return;
+        db.collection('users').orderBy('userStats.xp', 'desc').limit(100).get().then(snapshot => {
+            let rank = 1;
+            let found = false;
+            snapshot.forEach(doc => {
+                if(doc.id === currentUser.uid) {
+                    found = true;
+                    const badge = document.getElementById('uiRankBadge');
+                    badge.innerText = `Rank #${rank}`;
+                    badge.style.display = 'inline-block';
+                }
+                rank++;
+            });
+            if(!found) {
+                const badge = document.getElementById('uiRankBadge');
+                badge.innerText = `Rank >100`;
+                badge.style.display = 'inline-block';
+            }
+        }).catch(e => console.error(e));
     }
 
     /* =========================================
@@ -1165,12 +1253,14 @@
               saveData();
               renderUserStats(); updateThemeDropdown();
               if (currentMainTab === 'Habits') renderHabits(); else renderStudy();
+              fetchGlobalRank();
             } else {
               userDisplayName = user.displayName || 'Student';
               document.getElementById('userInfo').innerText = userDisplayName;
               saveData(); // Initializes the doc
               renderUserStats(); updateThemeDropdown();
               if (currentMainTab === 'Habits') renderHabits(); else renderStudy();
+              fetchGlobalRank();
             }
           });
         } else {
